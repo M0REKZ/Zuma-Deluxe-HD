@@ -9,7 +9,8 @@
 #define MAX_FPS 60
 #define FRAME_DELAY 1000 / MAX_FPS
 
-static struct {
+static struct
+{
   Game game;
   MenuMgr menuMgr;
 
@@ -25,7 +26,8 @@ static struct {
   bool isRunning;
 } app;
 
-static int ApplicationZuma_LoadResources(void) {
+static int ApplicationZuma_LoadResources(void)
+{
   if (!Engine_LoadSettings())
     return 9;
 
@@ -46,7 +48,8 @@ static int ApplicationZuma_LoadResources(void) {
   return 0;
 }
 
-static int ApplicationZuma_ShowStartupImage(void) {
+static int ApplicationZuma_ShowStartupImage(void)
+{
   SDL_Texture *texDisc = Engine_TextureLoad("images/disclaimer.jpg");
   if (!texDisc)
     return 10;
@@ -58,18 +61,22 @@ static int ApplicationZuma_ShowStartupImage(void) {
   return 0;
 }
 
-static void ApplicationZuma_HandleEvents(void) {
+static void ApplicationZuma_HandleEvents(void)
+{
   app.mouseClicked = 0;
 
   SDL_Event e;
-  while (SDL_PollEvent(&e) != 0) {
-    switch (e.type) {
+  while (SDL_PollEvent(&e) != 0)
+  {
+    switch (e.type)
+    {
     case SDL_QUIT:
       exit(0);
       break;
     case SDL_MOUSEBUTTONDOWN:
 
-      switch (e.button.button) {
+      switch (e.button.button)
+      {
       case SDL_BUTTON_LEFT:
         app.mouseClicked = 1;
         break;
@@ -82,21 +89,27 @@ static void ApplicationZuma_HandleEvents(void) {
   }
 }
 
-static void ApplicationZuma_Update(void) {
+static void ApplicationZuma_Update(void)
+{
   SDL_RenderClear(engine.render);
 
-  if (app.inMenu) {
+  if (app.inMenu)
+  {
     MenuMgr_Update(&app.menuMgr);
 
-    if (app.menuMgr.roomID == MR_GAME && app.inMenu) {
+    if (app.menuMgr.roomID == MR_GAME && app.inMenu)
+    {
       app.inMenu = 0;
       Game_Init(&app.game, app.curLvl, app.curDifficulty);
     }
 
     MenuMgr_Draw(&app.menuMgr);
-  } else {
+  }
+  else
+  {
     Game_Update(&app.game, &app.inMenu, app.mouseClicked);
-    if (app.inMenu) {
+    if (app.inMenu)
+    {
       MenuMgr_Set(&app.menuMgr, MR_GAUNTLET);
       return;
     }
@@ -107,7 +120,8 @@ static void ApplicationZuma_Update(void) {
   SDL_RenderPresent(engine.render);
 }
 
-int ApplicationZuma_Start(void) {
+int ApplicationZuma_Start(void)
+{
   if (!Engine_Init())
     return 1;
 
@@ -128,7 +142,8 @@ int ApplicationZuma_Start(void) {
   MenuMgr_Init(&app.menuMgr, &app.curLvl, &app.curDifficulty);
   MenuMgr_Set(&app.menuMgr, MR_MAIN);
 
-  while (app.isRunning) {
+  while (app.isRunning)
+  {
     ApplicationZuma_HandleEvents();
 
     app.frameStart = SDL_GetTicks();

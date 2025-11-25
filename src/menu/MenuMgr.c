@@ -1,7 +1,8 @@
 #include "MenuMgr.h"
 #include <SDL_mixer.h>
 
-void Button_Init(Button *btn) {
+void Button_Init(Button *btn)
+{
   btn->state = BTN_IDLE;
   btn->clicked = false;
   btn->pressed = false;
@@ -27,12 +28,14 @@ void Button_Init(Button *btn) {
   btn->pos.y = 0;
 }
 
-void Button_SetText(Button *btn, const char *str) {
+void Button_SetText(Button *btn, const char *str)
+{
   strcpy(btn->text, str);
   btn->withText = true;
 }
 
-void Button_Update(Button *btn) {
+void Button_Update(Button *btn)
+{
   int mx, my;
   Engine_GetMousePos(&mx, &my);
 
@@ -40,26 +43,37 @@ void Button_Update(Button *btn) {
 
   if (mx > btn->pos.x + btn->deadBorder && my > btn->pos.y + btn->deadBorder &&
       mx < btn->pos.x + bWidth - btn->deadBorder &&
-      my < btn->pos.y + btn->tRect.h - btn->deadBorder) {
-    if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-      if (btn->state != BTN_CLICKED) {
+      my < btn->pos.y + btn->tRect.h - btn->deadBorder)
+  {
+    if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
+    {
+      if (btn->state != BTN_CLICKED)
+      {
         btn->state = BTN_CLICKED;
         Engine_PlaySound(btn->soundClickID);
       }
-    } else {
+    }
+    else
+    {
       btn->clicked = (btn->state == BTN_CLICKED);
 
-      if ((!btn->state) == BTN_HOVER) {
-        if (btn->soundHoverSfxID != -1) {
+      if ((!btn->state) == BTN_HOVER)
+      {
+        if (btn->soundHoverSfxID != -1)
+        {
           Engine_PlaySoundSfxPitch(btn->soundHoverSfxID, btn->sndSfxPitch);
-        } else if (btn->soundHoverID != -1) {
+        }
+        else if (btn->soundHoverID != -1)
+        {
           Engine_PlaySound(btn->soundHoverID);
         }
       }
 
       btn->state = BTN_HOVER;
     }
-  } else {
+  }
+  else
+  {
     btn->state = BTN_IDLE;
     btn->clicked = false;
   }
@@ -67,7 +81,8 @@ void Button_Update(Button *btn) {
 
 int Button_IsClicked(Button *btn) { return btn->clicked; }
 
-void Button_Draw(Button *btn) {
+void Button_Draw(Button *btn)
+{
   SDL_Texture *tex = Engine_GetTextureSDL(btn->textureID);
 
   SDL_Rect dstRect = {
@@ -78,7 +93,8 @@ void Button_Draw(Button *btn) {
   };
 
   SDL_Rect srcRect = btn->tRect;
-  if (btn->xscale == 1) {
+  if (btn->xscale == 1)
+  {
     srcRect = btn->tRect;
 
     if (btn->state == BTN_HOVER)
@@ -89,11 +105,14 @@ void Button_Draw(Button *btn) {
       srcRect.x = btn->tRect.x;
 
     SDL_RenderCopy(engine.render, tex, &srcRect, &dstRect);
-  } else {
+  }
+  else
+  {
     srcRect.w = btn->tRect.w / 3;
     dstRect.w = srcRect.w;
     int dx = 0;
-    for (int i = 0; i < 2 + btn->xscale; i++) {
+    for (int i = 0; i < 2 + btn->xscale; i++)
+    {
       if (i == 0)
         dx = 0;
       else if (i == 2 + btn->xscale - 1)
@@ -115,7 +134,8 @@ void Button_Draw(Button *btn) {
   }
 
   // DrawText
-  if (btn->withText) {
+  if (btn->withText)
+  {
     int bWidth = btn->tRect.w + (btn->tRect.w / 3) * btn->xscale;
     int cx = btn->pos.x + bWidth / 2 - 24;
 
@@ -126,7 +146,8 @@ void Button_Draw(Button *btn) {
     if (btn->state == BTN_IDLE)
       color.b = 0;
 
-    if (btn->state == BTN_CLICKED) {
+    if (btn->state == BTN_CLICKED)
+    {
       dx = -2;
       dy = +2;
     }
@@ -138,7 +159,8 @@ void Button_Draw(Button *btn) {
 
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
-void CheckBox_Init(CheckBox *cb) {
+void CheckBox_Init(CheckBox *cb)
+{
   cb->checked = false;
   cb->clicked = false;
 
@@ -146,19 +168,25 @@ void CheckBox_Init(CheckBox *cb) {
   cb->pos.y = 0;
 }
 
-void CheckBox_Update(CheckBox *cb) {
+void CheckBox_Update(CheckBox *cb)
+{
   int mx, my;
   Engine_GetMousePos(&mx, &my);
 
   if (mx > cb->pos.x && my > cb->pos.y && mx < cb->pos.x + CHECK_BOX_WIDTH &&
-      my < cb->pos.y + CHECK_BOX_HEIGHT) {
-    if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-      if (!cb->clicked) {
+      my < cb->pos.y + CHECK_BOX_HEIGHT)
+  {
+    if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
+    {
+      if (!cb->clicked)
+      {
         Engine_PlaySound(SND_BUTTON2);
         cb->checked = !cb->checked;
         cb->clicked = true;
       }
-    } else {
+    }
+    else
+    {
       cb->clicked = false;
     }
   }
@@ -168,7 +196,8 @@ int CheckBox_IsClicked(CheckBox *cb) { return cb->clicked; }
 
 int CheckBox_IsChecked(CheckBox *cb) { return cb->checked; }
 
-void CheckBox_Draw(CheckBox *cb) {
+void CheckBox_Draw(CheckBox *cb)
+{
   SDL_Texture *texture = Engine_GetTextureSDL(TEX_MENU);
 
   SDL_Rect srcRect = {CHECK_BOX_WIDTH * !cb->checked, 462, CHECK_BOX_WIDTH,
@@ -182,7 +211,8 @@ void CheckBox_Draw(CheckBox *cb) {
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 
-void Slider_Init(Slider *s, float *val) {
+void Slider_Init(Slider *s, float *val)
+{
   s->pos.x = 0;
   s->pos.y = 0;
 
@@ -194,21 +224,27 @@ void Slider_Init(Slider *s, float *val) {
   s->thumbPos = (SLIDER_THUMB_MAX * (*s->value)) / s->maxValue;
 }
 
-void Slider_Update(Slider *s) {
+void Slider_Update(Slider *s)
+{
   int mx, my;
   Engine_GetMousePos(&mx, &my);
 
   if (mx > s->pos.x + s->thumbPos && my > s->pos.y &&
       mx < s->pos.x + s->thumbPos + SLIDER_THUMB_WIDTH &&
-      my < s->pos.y + SLIDER_HEIGHT) {
-    if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+      my < s->pos.y + SLIDER_HEIGHT)
+  {
+    if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
+    {
       s->drag = true;
-    } else {
+    }
+    else
+    {
       s->drag = false;
     }
   }
 
-  if (s->drag) {
+  if (s->drag)
+  {
     if (!(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)))
       s->drag = false;
 
@@ -225,7 +261,8 @@ void Slider_Update(Slider *s) {
 
 int Slider_IsDragging(Slider *s) { return s->drag; }
 
-void Slider_Draw(Slider *s) {
+void Slider_Draw(Slider *s)
+{
   SDL_Texture *texture = Engine_GetTextureSDL(TEX_MENU);
 
   SDL_Rect srcRect = {0, 365, 307, 49};
@@ -243,7 +280,8 @@ void Slider_Draw(Slider *s) {
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 
-void DialogueBoxText_Init(DialogueBoxText *dbt) {
+void DialogueBoxText_Init(DialogueBoxText *dbt)
+{
   dbt->FontID = FONT_CANCUN_10;
   strcpy(dbt->str, "ERROR");
 
@@ -256,7 +294,8 @@ void DialogueBoxText_Init(DialogueBoxText *dbt) {
   dbt->color.b = 0;
 }
 
-DialogueBox *DialogueBox_Create() {
+DialogueBox *DialogueBox_Create()
+{
   DialogueBox *db = malloc(sizeof(DialogueBox));
   if (!db)
     return NULL;
@@ -291,7 +330,8 @@ DialogueBox *DialogueBox_Create() {
   return db;
 }
 
-void DialogueBox_AddButton(DialogueBox *db, Button *btn) {
+void DialogueBox_AddButton(DialogueBox *db, Button *btn)
+{
   Button *ptr = realloc(db->buttons, sizeof(Button) * (db->buttonsLen + 1));
 
   if (!ptr)
@@ -304,7 +344,8 @@ void DialogueBox_AddButton(DialogueBox *db, Button *btn) {
   db->buttonsLen++;
 }
 
-void DialogueBox_AddCheckBox(DialogueBox *db, CheckBox *cb) {
+void DialogueBox_AddCheckBox(DialogueBox *db, CheckBox *cb)
+{
   CheckBox *ptr = realloc(db->chBoxes, sizeof(CheckBox) * (db->chBoxesLen + 1));
 
   if (!ptr)
@@ -317,7 +358,8 @@ void DialogueBox_AddCheckBox(DialogueBox *db, CheckBox *cb) {
   db->chBoxesLen++;
 }
 
-void DialogueBox_AddSlider(DialogueBox *db, Slider *s) {
+void DialogueBox_AddSlider(DialogueBox *db, Slider *s)
+{
   Slider *ptr = realloc(db->sliders, sizeof(Slider) * (db->slidersLen + 1));
 
   if (!ptr)
@@ -330,7 +372,8 @@ void DialogueBox_AddSlider(DialogueBox *db, Slider *s) {
   db->slidersLen++;
 }
 
-void DialogueBox_AddText(DialogueBox *db, DialogueBoxText *t) {
+void DialogueBox_AddText(DialogueBox *db, DialogueBoxText *t)
+{
   DialogueBoxText *ptr =
       realloc(db->texts, sizeof(DialogueBoxText) * (db->textsLen + 1));
 
@@ -346,14 +389,16 @@ void DialogueBox_AddText(DialogueBox *db, DialogueBoxText *t) {
   db->textsLen++;
 }
 
-void DialogueBox_SetTextStr(DialogueBox *db, int textID, const char *str) {
+void DialogueBox_SetTextStr(DialogueBox *db, int textID, const char *str)
+{
   if (textID < 0 || textID >= db->textsLen)
     return;
 
   strcpy(db->texts[textID].str, str);
 }
 
-void DialogueBox_Animate(DialogueBox *db) {
+void DialogueBox_Animate(DialogueBox *db)
+{
   db->animation = true;
 
   int dy = WINDOW_HEIGHT + (121 * db->sizeH) / 2;
@@ -369,18 +414,21 @@ void DialogueBox_Animate(DialogueBox *db) {
     db->texts[i].pos.y += dy;
 }
 
-int DialogueBox_GetBtn(DialogueBox *db) {
+int DialogueBox_GetBtn(DialogueBox *db)
+{
   int btn = db->pressedBtn;
   db->pressedBtn = 0;
   return btn;
 }
 
-void DialogueBox_Update(DialogueBox *db) {
+void DialogueBox_Update(DialogueBox *db)
+{
 
   if (db->animation)
     return;
 
-  for (int i = 0; i < db->buttonsLen; i++) {
+  for (int i = 0; i < db->buttonsLen; i++)
+  {
     Button_Update(&db->buttons[i]);
 
     if (Button_IsClicked(&db->buttons[i]))
@@ -394,18 +442,23 @@ void DialogueBox_Update(DialogueBox *db) {
     Slider_Update(&db->sliders[i]);
 }
 
-static int min(int a, int b) {
-  if (a < b) {
+static int min(int a, int b)
+{
+  if (a < b)
+  {
     return a;
   }
 
   return b;
 }
 
-void DialogueBox_Draw(DialogueBox *db) {
+void DialogueBox_Draw(DialogueBox *db)
+{
 
-  if (db->animation) {
-    if (db->pos.y > db->startY) {
+  if (db->animation)
+  {
+    if (db->pos.y > db->startY)
+    {
       int spd = min(DB_ANIM_SPD, db->pos.y - db->startY);
       db->pos.y -= spd;
       for (int i = 0; i < db->buttonsLen; i++)
@@ -416,7 +469,9 @@ void DialogueBox_Draw(DialogueBox *db) {
         db->sliders[i].pos.y -= spd;
       for (int i = 0; i < db->textsLen; i++)
         db->texts[i].pos.y -= spd;
-    } else {
+    }
+    else
+    {
       db->animation = false;
     }
   }
@@ -429,7 +484,8 @@ void DialogueBox_Draw(DialogueBox *db) {
 
   SDL_Rect srcBgRect = {0, 0, 121, 121};
   SDL_Rect dstBgRect = {0, 0, 121, 121};
-  for (int i = 0; i < db->sizeH; i++) {
+  for (int i = 0; i < db->sizeH; i++)
+  {
     if (i == 0)
       srcBgRect.y = 0;
     else if (i == db->sizeH - 1)
@@ -437,7 +493,8 @@ void DialogueBox_Draw(DialogueBox *db) {
     else
       srcBgRect.y = 121;
 
-    for (int j = 0; j < db->sizeW; j++) {
+    for (int j = 0; j < db->sizeW; j++)
+    {
       if (j == 0)
         srcBgRect.x = 0;
       else if (j == db->sizeW - 1)
@@ -453,7 +510,8 @@ void DialogueBox_Draw(DialogueBox *db) {
   }
 
   // God Head
-  if (db->drawGodHead) {
+  if (db->drawGodHead)
+  {
     SDL_Rect srcRect = {363, 0, 234, 210};
     SDL_Rect dstRect = {db->pos.x - 117, dPos.y - 112, 234, 210};
 
@@ -477,14 +535,16 @@ void DialogueBox_Draw(DialogueBox *db) {
   for (int i = 0; i < db->slidersLen; i++)
     Slider_Draw(&db->sliders[i]);
 
-  for (int i = 0; i < db->textsLen; i++) {
+  for (int i = 0; i < db->textsLen; i++)
+  {
     Engine_DrawTextExt(db->texts[i].str, db->texts[i].FontID,
                        db->texts[i].color, true, false, db->texts[i].pos.x,
                        db->texts[i].pos.y);
   }
 }
 
-void DialogueBox_Destroy(DialogueBox *db) {
+void DialogueBox_Destroy(DialogueBox *db)
+{
   db->buttonsLen = 0;
   free(db->buttons);
   db->chBoxesLen = 0;
@@ -498,7 +558,8 @@ void DialogueBox_Destroy(DialogueBox *db) {
   db = NULL;
 }
 
-DialogueBox *DialogueBox_CreateOptions() {
+DialogueBox *DialogueBox_CreateOptions()
+{
   DialogueBox *db = DialogueBox_Create();
   db->sizeW = 5;
   db->sizeH = 4;
@@ -556,25 +617,32 @@ DialogueBox *DialogueBox_CreateOptions() {
   return db;
 }
 
-void DialogueBox_UpdateOptions(DialogueBox *db) {
+void DialogueBox_UpdateOptions(DialogueBox *db)
+{
   DialogueBox_Update(db);
 
-  if (CheckBox_IsClicked(&db->chBoxes[0])) {
-    if (CheckBox_IsChecked(&db->chBoxes[0])) {
+  if (CheckBox_IsClicked(&db->chBoxes[0]))
+  {
+    if (CheckBox_IsChecked(&db->chBoxes[0]))
+    {
       SDL_SetWindowFullscreen(engine.win, SDL_WINDOW_FULLSCREEN);
       engine.fullScr = true;
-    } else {
+    }
+    else
+    {
       SDL_SetWindowFullscreen(engine.win, 0);
       engine.fullScr = false;
     }
   }
 
-  if (Slider_IsDragging(&db->sliders[0])) {
+  if (Slider_IsDragging(&db->sliders[0]))
+  {
     Mix_VolumeMusic(MIX_MAX_VOLUME * engine.volMus);
   }
 }
 
-DialogueBox *DialogueBox_CreateMenu() {
+DialogueBox *DialogueBox_CreateMenu()
+{
   DialogueBox *db = DialogueBox_CreateOptions();
   strcpy(db->caption, "mENU");
 
@@ -593,7 +661,8 @@ DialogueBox *DialogueBox_CreateMenu() {
 
 void DialogueBox_UpdateMenu(DialogueBox *db) { DialogueBox_UpdateOptions(db); }
 
-DialogueBox *DialogueBox_CreateResults() {
+DialogueBox *DialogueBox_CreateResults()
+{
   DialogueBox *db = DialogueBox_Create();
   strcpy(db->caption, "STATS");
   db->sizeW = 6;
@@ -602,13 +671,17 @@ DialogueBox *DialogueBox_CreateResults() {
 
   // Param Names
   DialogueBoxText tParamNames[7];
-  for (int i = 0; i < 7; i++) {
+  for (int i = 0; i < 7; i++)
+  {
     DialogueBoxText_Init(&tParamNames[i]);
     tParamNames[i].FontID = FONT_CANCUN_12;
-    if (i < 5) {
+    if (i < 5)
+    {
       tParamNames[i].pos.x = -262;
       tParamNames[i].pos.y = -100 + (28 * i);
-    } else {
+    }
+    else
+    {
       tParamNames[i].pos.x = 32;
       tParamNames[i].pos.y = -100 + (28 * (i - 5));
     }
@@ -627,7 +700,8 @@ DialogueBox *DialogueBox_CreateResults() {
 
   // Params
   DialogueBoxText tParam[7];
-  for (int i = 0; i < 7; i++) {
+  for (int i = 0; i < 7; i++)
+  {
     DialogueBoxText_Init(&tParam[i]);
     tParam[i].FontID = FONT_CANCUN_12;
     tParam[i].color.g = 152;
@@ -652,7 +726,8 @@ DialogueBox *DialogueBox_CreateResults() {
   return db;
 }
 
-DialogueBox *DialogueBox_CreateGameOver() {
+DialogueBox *DialogueBox_CreateGameOver()
+{
   DialogueBox *db = DialogueBox_Create();
   strcpy(db->caption, "GAmE OvER");
   db->sizeW = 6;
@@ -661,13 +736,17 @@ DialogueBox *DialogueBox_CreateGameOver() {
 
   // Param Names
   DialogueBoxText tParamNames[5];
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 5; i++)
+  {
     DialogueBoxText_Init(&tParamNames[i]);
     tParamNames[i].FontID = FONT_CANCUN_12;
-    if (i < 3) {
+    if (i < 3)
+    {
       tParamNames[i].pos.x = -262;
       tParamNames[i].pos.y = -100 + (28 * i);
-    } else {
+    }
+    else
+    {
       tParamNames[i].pos.x = 32;
       tParamNames[i].pos.y = -100 + (28 * (i - 3));
     }
@@ -684,7 +763,8 @@ DialogueBox *DialogueBox_CreateGameOver() {
 
   // Params
   DialogueBoxText tParam[5];
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 5; i++)
+  {
     DialogueBoxText_Init(&tParam[i]);
     tParam[i].FontID = FONT_CANCUN_12;
     tParam[i].color.g = 152;
@@ -712,7 +792,8 @@ DialogueBox *DialogueBox_CreateGameOver() {
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 
-Menu *Menu_Create() {
+Menu *Menu_Create()
+{
   Menu *menu = malloc(sizeof(Menu));
 
   menu->haveSky = false;
@@ -725,7 +806,8 @@ Menu *Menu_Create() {
   return menu;
 }
 
-void Menu_AddButton(Menu *menu, Button *btn) {
+void Menu_AddButton(Menu *menu, Button *btn)
+{
   Button *ptr = realloc(menu->buttons, sizeof(Button) * (menu->buttonsLen + 1));
 
   if (!ptr)
@@ -738,20 +820,24 @@ void Menu_AddButton(Menu *menu, Button *btn) {
 
 void Menu_SetBgRect(Menu *menu, SDL_Rect rect) { menu->trBg = rect; }
 
-void Menu_SetSkyRect(Menu *menu, SDL_Rect rect) {
+void Menu_SetSkyRect(Menu *menu, SDL_Rect rect)
+{
   menu->haveSky = true;
 
   menu->trBgSky = rect;
 }
 
-int Menu_GetButton(Menu *menu) {
+int Menu_GetButton(Menu *menu)
+{
   int btn = menu->pressedBtn;
   menu->pressedBtn = 0;
   return btn;
 }
 
-void Menu_Update(Menu *menu) {
-  for (int i = 0; i < menu->buttonsLen; i++) {
+void Menu_Update(Menu *menu)
+{
+  for (int i = 0; i < menu->buttonsLen; i++)
+  {
     Button_Update(&menu->buttons[i]);
 
     if (Button_IsClicked(&menu->buttons[i]))
@@ -759,10 +845,12 @@ void Menu_Update(Menu *menu) {
   }
 }
 
-void Menu_Draw(Menu *menu) {
+void Menu_Draw(Menu *menu)
+{
   SDL_Texture *tex = Engine_GetTextureSDL(TEX_MENU);
 
-  if (menu->haveSky) {
+  if (menu->haveSky)
+  {
     static int skyPos = 0;
     skyPos += SKY_SPD;
 
@@ -779,12 +867,14 @@ void Menu_Draw(Menu *menu) {
   SDL_Rect dtrBg = {0, 0, 1280, 720};
   SDL_RenderCopy(engine.render, tex, &menu->trBg, &dtrBg);
 
-  for (int i = 0; i < menu->buttonsLen; i++) {
+  for (int i = 0; i < menu->buttonsLen; i++)
+  {
     Button_Draw(&menu->buttons[i]);
   }
 }
 
-void Menu_Destroy(Menu *menu) {
+void Menu_Destroy(Menu *menu)
+{
   menu->buttonsLen = 0;
   free(menu->buttons);
   free(menu);
@@ -793,7 +883,8 @@ void Menu_Destroy(Menu *menu) {
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 
-void MenuMgr_Init(MenuMgr *m, int *curLvl, int *curDiff) {
+void MenuMgr_Init(MenuMgr *m, int *curLvl, int *curDiff)
+{
   m->roomID = MR_MAIN;
   m->room = NULL;
   m->dbOptions = NULL;
@@ -802,19 +893,23 @@ void MenuMgr_Init(MenuMgr *m, int *curLvl, int *curDiff) {
   m->curDiff = curDiff;
 }
 
-void MenuMgr_Set(MenuMgr *m, int room) {
-  if (m->room != NULL) {
+void MenuMgr_Set(MenuMgr *m, int room)
+{
+  if (m->room != NULL)
+  {
     Menu_Destroy(m->room);
   }
 
   m->roomID = room;
-  if (m->roomID == MR_GAME) {
+  if (m->roomID == MR_GAME)
+  {
     m->room = NULL;
     return;
   }
 
   m->room = Menu_Create();
-  if (m->roomID == MR_MAIN) {
+  if (m->roomID == MR_MAIN)
+  {
     Engine_PlayMusic(MUS_MAIN_MENU);
 
     SDL_Rect mBgRect = {1282, 720, 1280, 720};
@@ -875,8 +970,9 @@ void MenuMgr_Set(MenuMgr *m, int room) {
     Menu_AddButton(m->room, &btnOptions);
     Menu_AddButton(m->room, &btnMore);
     Menu_AddButton(m->room, &btnQuit);
-
-  } else if (m->roomID == MR_GAUNTLET) {
+  }
+  else if (m->roomID == MR_GAUNTLET)
+  {
     Engine_PlayMusic(MUS_GAUNTLET);
 
     SDL_Rect mBgRect = {1282, 1440, 1280, 720};
@@ -946,15 +1042,18 @@ void MenuMgr_Set(MenuMgr *m, int room) {
   }
 }
 
-void MenuMgr_Update(MenuMgr *m) {
+void MenuMgr_Update(MenuMgr *m)
+{
   if (!m)
     return;
 
   if (!m->inDialog)
     Menu_Update(m->room);
 
-  if (m->roomID == MR_MAIN) {
-    switch (Menu_GetButton(m->room)) {
+  if (m->roomID == MR_MAIN)
+  {
+    switch (Menu_GetButton(m->room))
+    {
     case 1:
       MenuMgr_Set(m, MR_GAUNTLET);
       break;
@@ -970,8 +1069,11 @@ void MenuMgr_Update(MenuMgr *m) {
       exit(0);
       break;
     }
-  } else if (m->roomID == MR_GAUNTLET) {
-    switch (Menu_GetButton(m->room)) {
+  }
+  else if (m->roomID == MR_GAUNTLET)
+  {
+    switch (Menu_GetButton(m->room))
+    {
     case 1:
       MenuMgr_Set(m, MR_MAIN);
       return;
@@ -1007,7 +1109,8 @@ void MenuMgr_Update(MenuMgr *m) {
     else if (*m->curLvl < 0)
       *m->curLvl = LEVELS_COUNT - 1;
 
-    for (int i = 4; i < 8; i++) {
+    for (int i = 4; i < 8; i++)
+    {
       if (i == 4 + (*m->curDiff))
         m->room->buttons[i].pressed = true;
       else
@@ -1015,10 +1118,12 @@ void MenuMgr_Update(MenuMgr *m) {
     }
   }
 
-  if (m->dbOptions) {
+  if (m->dbOptions)
+  {
     DialogueBox_UpdateOptions(m->dbOptions);
 
-    if (DialogueBox_GetBtn(m->dbOptions) == 1) {
+    if (DialogueBox_GetBtn(m->dbOptions) == 1)
+    {
       Engine_SaveSettings();
       DialogueBox_Destroy(m->dbOptions);
       m->dbOptions = NULL;
@@ -1027,7 +1132,8 @@ void MenuMgr_Update(MenuMgr *m) {
   }
 }
 
-void MenuMgr_Draw(MenuMgr *m) {
+void MenuMgr_Draw(MenuMgr *m)
+{
   if (m->roomID == MR_GAME)
     return;
 
@@ -1038,7 +1144,8 @@ void MenuMgr_Draw(MenuMgr *m) {
   if (m->dbOptions)
     DialogueBox_Draw(m->dbOptions);
 
-  if (m->roomID == MR_MAIN) {
+  if (m->roomID == MR_MAIN)
+  {
     SDL_Texture *tempTex = Engine_GetTextureSDL(TEX_MENU);
 
     SDL_Rect srcSunRect = {2563, 315, 130, 138};
@@ -1062,8 +1169,9 @@ void MenuMgr_Draw(MenuMgr *m) {
     Engine_DrawText("REMASTER BY\nGALAXYSHAD, HCSUBSER,\n180WATT AND S4LAT. 2021-2025", FONT_CANCUN_10,
                     16, 644);
     Engine_DrawText("ORIGINAL GAME BY POPCAP. 2003", FONT_CANCUN_10, 16, 694);
-
-  } else if (m->roomID == MR_GAUNTLET) {
+  }
+  else if (m->roomID == MR_GAUNTLET)
+  {
     char buff[32];
     SDL_Color color = {255, 255, 255, 255};
 

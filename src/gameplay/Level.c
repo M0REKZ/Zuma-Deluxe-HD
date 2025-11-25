@@ -5,12 +5,14 @@
 LevelMgr levelMgr;
 int xmlDepth;
 
-static void LevelParser_ParseGraphics(const char **attribute) {
+static void LevelParser_ParseGraphics(const char **attribute)
+{
 
   LevelGraphics *ptr = realloc(
       levelMgr.graphics, sizeof(LevelGraphics) * (levelMgr.graphicsLen + 1));
 
-  if (!ptr) {
+  if (!ptr)
+  {
     Engine_PushErrorFile("levels.xml", "Out of Memory!");
     return;
   }
@@ -30,7 +32,8 @@ static void LevelParser_ParseGraphics(const char **attribute) {
   g->coinsLen = 0;
   g->coinsPos = NULL;
 
-  for (int i = 0; attribute[i]; i += 2) {
+  for (int i = 0; attribute[i]; i += 2)
+  {
     if (strcmp(attribute[i], "id") == 0)
       strcpy(g->id, attribute[i + 1]);
     else if (strcmp(attribute[i], "curve") == 0)
@@ -50,12 +53,14 @@ static void LevelParser_ParseGraphics(const char **attribute) {
   }
 }
 
-static void LevelParser_ParseTreasurePoints(const char **attribute) {
+static void LevelParser_ParseTreasurePoints(const char **attribute)
+{
   LevelGraphics *g = &levelMgr.graphics[levelMgr.graphicsLen - 1];
 
   SDL_FPoint *ptr = (SDL_FPoint *)realloc(g->coinsPos, sizeof(SDL_FPoint) *
                                                            (g->coinsLen + 1));
-  if (!ptr) {
+  if (!ptr)
+  {
     Engine_PushErrorFile("levels.xml", "Out of Memory!");
     return;
   }
@@ -63,7 +68,8 @@ static void LevelParser_ParseTreasurePoints(const char **attribute) {
   g->coinsPos = ptr;
   g->coinsLen++;
 
-  for (int i = 0; attribute[i]; i += 2) {
+  for (int i = 0; attribute[i]; i += 2)
+  {
     if (strcmp(attribute[i], "x") == 0)
       g->coinsPos[g->coinsLen - 1].x = atof(attribute[i + 1]);
     else if (strcmp(attribute[i], "y") == 0)
@@ -71,11 +77,13 @@ static void LevelParser_ParseTreasurePoints(const char **attribute) {
   }
 }
 
-static void LevelParser_ParseSettings(const char **attribute) {
+static void LevelParser_ParseSettings(const char **attribute)
+{
   LevelSettings *ptr = realloc(
       levelMgr.settings, sizeof(LevelSettings) * (levelMgr.settingsLen + 1));
 
-  if (!ptr) {
+  if (!ptr)
+  {
     Engine_PushErrorFile("levels.xml", "Out of Memory!");
     return;
   }
@@ -95,7 +103,8 @@ static void LevelParser_ParseSettings(const char **attribute) {
   s->partTime = 30;
   s->slowFactor = 4;
 
-  for (int i = 0; attribute[i]; i += 2) {
+  for (int i = 0; attribute[i]; i += 2)
+  {
     if (strcmp(attribute[i], "id") == 0)
       strcpy(s->id, attribute[i + 1]);
     else if (strcmp(attribute[i], "speed") == 0)
@@ -117,24 +126,31 @@ static void LevelParser_ParseSettings(const char **attribute) {
   }
 }
 
-static void LevelParser_ParseStageProgression(const char **attribute) {
+static void LevelParser_ParseStageProgression(const char **attribute)
+{
 
   for (int i = 0; i < STAGE_COUNT; i++)
     levelMgr.stages[i].levelsLen = 0;
 
-  for (int i = 0; attribute[i]; i += 2) {
-    if (strncmp(attribute[i], "stage", 5) == 0) {
+  for (int i = 0; attribute[i]; i += 2)
+  {
+    if (strncmp(attribute[i], "stage", 5) == 0)
+    {
       char *cid = strtok((char *)attribute[i], "stage");
       int stageID = atoi(cid) - 1;
 
       char *gID = strtok((char *)attribute[i + 1], ",");
-      while (gID) {
-        for (int i = 0; i < levelMgr.graphicsLen; i++) {
-          if (strcmp(gID, levelMgr.graphics[i].id) == 0) {
+      while (gID)
+      {
+        for (int i = 0; i < levelMgr.graphicsLen; i++)
+        {
+          if (strcmp(gID, levelMgr.graphics[i].id) == 0)
+          {
             Level *ptr = realloc(levelMgr.stages[stageID].levels,
                                  sizeof(Level) *
                                      (levelMgr.stages[stageID].levelsLen + 1));
-            if (!ptr) {
+            if (!ptr)
+            {
               Engine_PushErrorFile("levels.xml", "Out of Memory!");
               return;
             }
@@ -151,15 +167,20 @@ static void LevelParser_ParseStageProgression(const char **attribute) {
         }
         gID = strtok(NULL, ",");
       }
-    } else if (strncmp(attribute[i], "diffi", 5) == 0) {
+    }
+    else if (strncmp(attribute[i], "diffi", 5) == 0)
+    {
       char *cid = strtok((char *)attribute[i], "diffi");
       int stageID = atoi(cid) - 1;
 
       char *sID = strtok((char *)attribute[i + 1], ",");
       int j = 0;
-      while (sID) {
-        for (int i = 0; i < levelMgr.settingsLen; i++) {
-          if (strcmp(sID, levelMgr.settings[i].id) == 0) {
+      while (sID)
+      {
+        for (int i = 0; i < levelMgr.settingsLen; i++)
+        {
+          if (strcmp(sID, levelMgr.settings[i].id) == 0)
+          {
             Level *lv = &levelMgr.stages[stageID].levels[j];
             lv->settingsID = malloc(sizeof(int));
             lv->settingsID[0] = i;
@@ -173,32 +194,46 @@ static void LevelParser_ParseStageProgression(const char **attribute) {
   }
 }
 
-void XML_StartElement(void *data, const char *element, const char **attribute) {
+void XML_StartElement(void *data, const char *element, const char **attribute)
+{
   (void)data;
-  if (strcmp(element, "Graphics") == 0) {
+  if (strcmp(element, "Graphics") == 0)
+  {
     LevelParser_ParseGraphics(attribute);
-  } else if (xmlDepth == 2 && strcmp(element, "TreasurePoint") == 0) {
+  }
+  else if (xmlDepth == 2 && strcmp(element, "TreasurePoint") == 0)
+  {
     LevelParser_ParseTreasurePoints(attribute);
-  } else if (strcmp(element, "Settings") == 0) {
+  }
+  else if (strcmp(element, "Settings") == 0)
+  {
     LevelParser_ParseSettings(attribute);
-  } else if (strcmp(element, "LevelProgression") == 0) {
+  }
+  else if (strcmp(element, "LevelProgression") == 0)
+  {
     // TODO
-  } else if (strcmp(element, "Level") == 0) {
+  }
+  else if (strcmp(element, "Level") == 0)
+  {
     // TODO
-  } else if (strcmp(element, "StageProgression") == 0) {
+  }
+  else if (strcmp(element, "StageProgression") == 0)
+  {
     LevelParser_ParseStageProgression(attribute);
   }
 
   xmlDepth++;
 }
 
-void XML_EndElement(void *data, const char *element) {
+void XML_EndElement(void *data, const char *element)
+{
   (void)data;
   (void)element;
   xmlDepth--;
 }
 
-int LevelMgr_LoadLevels(const char *fileName) {
+int LevelMgr_LoadLevels(const char *fileName)
+{
   levelMgr.graphics = NULL;
   levelMgr.graphicsLen = 0;
   levelMgr.settings = NULL;
@@ -206,8 +241,10 @@ int LevelMgr_LoadLevels(const char *fileName) {
   levelMgr.survivalLevels = NULL;
   levelMgr.survivalLevelsLen = 0;
 
-  for (int i = 0; i < LEVELS_COUNT; i++) {
-    for (int j = 0; j < 4; j++) {
+  for (int i = 0; i < LEVELS_COUNT; i++)
+  {
+    for (int j = 0; j < 4; j++)
+    {
       levelMgr.bestScore[i][j] = 0;
       levelMgr.bestTime[i][j] = 0;
     }
@@ -219,13 +256,15 @@ int LevelMgr_LoadLevels(const char *fileName) {
   sprintf(path, "%s/%s", PATH_LEVEL, fileName);
 
   char *buff = malloc(XML_BUFF_SIZE);
-  if (!buff) {
+  if (!buff)
+  {
     Engine_PushErrorFile(path, "Out of memory!");
     return 0;
   }
 
   FILE *fp = fopen(path, "r");
-  if (!fp) {
+  if (!fp)
+  {
     Engine_PushErrorFile(path, "�� ������� ������� ����!");
     return 0;
   }
@@ -233,10 +272,12 @@ int LevelMgr_LoadLevels(const char *fileName) {
   XML_Parser parser = XML_ParserCreate(NULL);
   XML_SetElementHandler(parser, XML_StartElement, XML_EndElement);
 
-  do {
+  do
+  {
     size_t len = fread(buff, 1, sizeof(buff), fp);
     done = len < sizeof(buff);
-    if (XML_Parse(parser, buff, len, done) == XML_STATUS_ERROR) {
+    if (XML_Parse(parser, buff, len, done) == XML_STATUS_ERROR)
+    {
       Engine_PushErrorFile(path, XML_ErrorString(XML_GetErrorCode(parser)));
       return 0;
     }
@@ -252,15 +293,19 @@ int LevelMgr_LoadLevels(const char *fileName) {
   return 1;
 }
 
-int LevelMgr_SaveProgress() {
+int LevelMgr_SaveProgress()
+{
   FILE *file = fopen("progress.bin", "wb");
-  if (!file) {
+  if (!file)
+  {
     return 0;
   }
 
   fputs("zumahdprog", file);
-  for (int i = 0; i < LEVELS_COUNT; i++) {
-    for (int j = 0; j < 4; j++) {
+  for (int i = 0; i < LEVELS_COUNT; i++)
+  {
+    for (int j = 0; j < 4; j++)
+    {
       fwrite(&levelMgr.bestScore[i][j], sizeof(int), 1, file);
       fwrite(&levelMgr.bestTime[i][j], sizeof(int), 1, file);
     }
@@ -270,10 +315,13 @@ int LevelMgr_SaveProgress() {
   return 1;
 }
 
-int LevelMgr_LoadProgress() {
+int LevelMgr_LoadProgress()
+{
   FILE *file = fopen("progress.bin", "rb");
-  if (!file) {
-    if (!LevelMgr_SaveProgress()) {
+  if (!file)
+  {
+    if (!LevelMgr_SaveProgress())
+    {
       Engine_PushError("Error reading file \"progress.bin\".",
                        "Could not open file for reading.");
       return 0;
@@ -283,23 +331,28 @@ int LevelMgr_LoadProgress() {
 
   char buff[11];
   fgets(buff, 11, file);
-  if (strcmp(buff, "zumahdprog") != 0) {
+  if (strcmp(buff, "zumahdprog") != 0)
+  {
     Engine_PushError("Error reading file \"progress.bin\".",
                      "Wrong file type.");
     fclose(file);
     return 0;
   }
 
-  for (int i = 0; i < LEVELS_COUNT; i++) {
-    for (int j = 0; j < 4; j++) {
-      if (fread(&levelMgr.bestScore[i][j], sizeof(int), 1, file) != 1) {
+  for (int i = 0; i < LEVELS_COUNT; i++)
+  {
+    for (int j = 0; j < 4; j++)
+    {
+      if (fread(&levelMgr.bestScore[i][j], sizeof(int), 1, file) != 1)
+      {
         Engine_PushError("File read error \"progress.bin\".",
                          "The file is damaged.");
         fclose(file);
         return 0;
       }
 
-      if (fread(&levelMgr.bestTime[i][j], sizeof(int), 1, file) != 1) {
+      if (fread(&levelMgr.bestTime[i][j], sizeof(int), 1, file) != 1)
+      {
         Engine_PushError("File read error \"progress.bin\".",
                          "The file is damaged.");
         fclose(file);
@@ -312,14 +365,16 @@ int LevelMgr_LoadProgress() {
   return 1;
 }
 
-Stage *LevelMgr_GetStage(int stageID) {
+Stage *LevelMgr_GetStage(int stageID)
+{
   if (stageID < 0 || stageID >= STAGE_COUNT)
     return NULL;
 
   return &levelMgr.stages[stageID];
 }
 
-Level *LevelMgr_GetLevelFromStage(int stageID, int lvID) {
+Level *LevelMgr_GetLevelFromStage(int stageID, int lvID)
+{
   if (stageID < 0 || stageID >= STAGE_COUNT)
     return NULL;
 
@@ -329,14 +384,16 @@ Level *LevelMgr_GetLevelFromStage(int stageID, int lvID) {
   return &levelMgr.stages[stageID].levels[lvID];
 }
 
-LevelGraphics *LevelMgr_GetLevelGraphics(Level *lv) {
+LevelGraphics *LevelMgr_GetLevelGraphics(Level *lv)
+{
   if (!lv)
     return NULL;
 
   return &levelMgr.graphics[lv->graphicsID];
 }
 
-LevelSettings *LevelMgr_GetLevelSettings(Level *lv, int settingID) {
+LevelSettings *LevelMgr_GetLevelSettings(Level *lv, int settingID)
+{
   if (!lv)
     return NULL;
 
@@ -346,7 +403,8 @@ LevelSettings *LevelMgr_GetLevelSettings(Level *lv, int settingID) {
   return &levelMgr.settings[lv->settingsID[settingID]];
 }
 
-int LevelMgr_Free() {
+int LevelMgr_Free()
+{
   for (int i = 0; i < levelMgr.graphicsLen; i++)
     free(levelMgr.graphics[i].coinsPos);
 
@@ -362,7 +420,8 @@ int LevelMgr_Free() {
 ////////////////////////////////////
 ////////////////////////////////////
 
-int Level_Load(Level *level) {
+int Level_Load(Level *level)
+{
   char path[STR_PATH_BUFFER_SIZE];
 
   sprintf(path, "%s/%s/%s.jpg", PATH_LEVEL,
@@ -374,7 +433,8 @@ int Level_Load(Level *level) {
 
   level->textureTopLayer = NULL;
   if (!(strcmp(levelMgr.graphics[level->graphicsID].textureTopLayerFile,
-               "none") == 0)) {
+               "none") == 0))
+  {
     sprintf(path, "%s/%s/%s.png", PATH_LEVEL,
             levelMgr.graphics[level->graphicsID].id,
             levelMgr.graphics[level->graphicsID].textureTopLayerFile);
@@ -406,7 +466,8 @@ int Level_Load(Level *level) {
   level->spiralLen = c - 1;
   level->spiral = malloc(sizeof(SpiralDot) * level->spiralLen);
 
-  for (size_t i = 0; i < level->spiralLen; i++) {
+  for (size_t i = 0; i < level->spiralLen; i++)
+  {
     char t1, t2, x, y;
     fread(&t1, 1, 1, file);
     fread(&t2, 1, 1, file);
@@ -420,62 +481,64 @@ int Level_Load(Level *level) {
   }
 
   fclose(file);
-	//spiral2
-	printf("\n%s",PATH_LEVEL);
-    sprintf(
-        path, 
-        "./%s/%s/%s.dat", 
-        PATH_LEVEL,
-        levelMgr.graphics[level->graphicsID].id,
-        levelMgr.graphics[level->graphicsID].spiral2File
-    );
-    file = fopen(path, "rb");
+  // spiral2
+  printf("\n%s", PATH_LEVEL);
+  sprintf(
+      path,
+      "./%s/%s/%s.dat",
+      PATH_LEVEL,
+      levelMgr.graphics[level->graphicsID].id,
+      levelMgr.graphics[level->graphicsID].spiral2File);
+  file = fopen(path, "rb");
 
-    if (!file){
-		level->spiral2 = NULL;
-        return 0;
-	}
+  if (!file)
+  {
+    level->spiral2 = NULL;
+    return 0;
+  }
 
-    fseek(file, 0x10, SEEK_SET);
-    count = 0;
-    fread(&count, sizeof(int32_t), 1, file);
-    fseek(file, 0x14 + count * 10, SEEK_SET);
+  fseek(file, 0x10, SEEK_SET);
+  count = 0;
+  fread(&count, sizeof(int32_t), 1, file);
+  fseek(file, 0x14 + count * 10, SEEK_SET);
 
-    c = 0;
-    cx = 0;
-	cy = 0;
+  c = 0;
+  cx = 0;
+  cy = 0;
 
-    fread(&c, sizeof(int32_t), 1, file);
-    fread(&cx, sizeof(float), 1, file);
-    fread(&cy, sizeof(float), 1, file);
+  fread(&c, sizeof(int32_t), 1, file);
+  fread(&cx, sizeof(float), 1, file);
+  fread(&cy, sizeof(float), 1, file);
 
+  level->spiral2Start.x = cx;
+  level->spiral2Start.y = cy;
+  printf("\nspiral2start %lf , %s", cx, __func__);
+  fflush(stdout);
 
-    level->spiral2Start.x = cx;
-    level->spiral2Start.y = cy;
-    printf("\nspiral2start %lf , %s",cx,__func__);fflush(stdout);
+  level->spiral2Len = c - 1;
+  level->spiral2 = malloc(sizeof(SpiralDot) * level->spiral2Len);
 
-    level->spiral2Len = c-1;
-    level->spiral2 = malloc(sizeof(SpiralDot) * level->spiral2Len);
+  // i;
+  for (int i = 0; i < level->spiral2Len; i++)
+  {
+    char t1, t2, x, y;
+    fread(&t1, 1, 1, file);
+    fread(&t2, 1, 1, file);
+    fread(&x, 1, 1, file);
+    fread(&y, 1, 1, file);
 
-    // i;
-    for (int i = 0; i < level->spiral2Len; i++) {
-        char t1, t2, x, y;
-        fread(&t1, 1, 1, file);
-        fread(&t2, 1, 1, file);
-        fread(&x, 1, 1, file);
-        fread(&y, 1, 1, file);
-
-        level->spiral2[i].t1 = t1;
-        level->spiral2[i].t2 = t2;
-        level->spiral2[i].dx = (float)x / 100.0;
-        level->spiral2[i].dy = (float)y / 100.0;
-    }
+    level->spiral2[i].t1 = t1;
+    level->spiral2[i].t2 = t2;
+    level->spiral2[i].dx = (float)x / 100.0;
+    level->spiral2[i].dy = (float)y / 100.0;
+  }
 
   fclose(file);
   return 1;
 }
 
-void Level_Free(Level *level) {
+void Level_Free(Level *level)
+{
   SDL_DestroyTexture(level->texture);
   SDL_DestroyTexture(level->textureTopLayer);
 
@@ -483,24 +546,28 @@ void Level_Free(Level *level) {
   free(level->spiral2);
 }
 
-void Level_Draw(Level *lvl) {
+void Level_Draw(Level *lvl)
+{
   int w, h;
   SDL_RenderGetLogicalSize(engine.render, &w, &h);
   Engine_DrawTextureSDL(lvl->texture, w / 2, h / 2);
 }
 
-void Level_DrawTopLayer(Level *lvl) {
+void Level_DrawTopLayer(Level *lvl)
+{
   int w, h;
   SDL_RenderGetLogicalSize(engine.render, &w, &h);
   Engine_DrawTextureSDL(lvl->textureTopLayer, w / 2, h / 2);
 }
 
-void Level_DrawDebug(Level *lvl) {
+void Level_DrawDebug(Level *lvl)
+{
   float sx, sy;
   sx = (104 + lvl->spiralStart.x) * engine.scale_x;
   sy = lvl->spiralStart.y * engine.scale_y;
   SDL_SetRenderDrawColor(engine.render, 255, 255, 255, 160);
-  for (size_t i = 0; i < lvl->spiralLen; i++) {
+  for (size_t i = 0; i < lvl->spiralLen; i++)
+  {
     if (lvl->spiral[i].t1)
       SDL_SetRenderDrawColor(engine.render, 0, 255, 0, 255);
     else
@@ -527,14 +594,16 @@ void Level_DrawDebug(Level *lvl) {
 
   LevelGraphics *g = LevelMgr_GetLevelGraphics(lvl);
   SDL_SetRenderDrawColor(engine.render, 0, 255, 0, 160);
-  for (int i = 0; i < g->coinsLen; i++) {
+  for (int i = 0; i < g->coinsLen; i++)
+  {
     SDL_FRect rect = {(104 + g->coinsPos[i].x - 16) * engine.scale_x,
                       (g->coinsPos[i].y - 16) * engine.scale_y, 32, 32};
     SDL_RenderDrawRectF(engine.render, &rect);
   }
 }
 
-char *Level_GetInfo(Level *lvl) {
+char *Level_GetInfo(Level *lvl)
+{
   char *info = malloc(512);
   char *curr = info;
   char *end = info + 512;

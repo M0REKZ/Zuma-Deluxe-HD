@@ -33,7 +33,8 @@
 
 #define RAD_TO_DEG 180 / M_PI
 
-typedef struct _Ball {
+typedef struct _Ball
+{
   unsigned char color, bonus;
   bool goBack, isInserted, isExploding, isSingle, inTunnel, drawPrority,
       startAnim;
@@ -43,7 +44,8 @@ typedef struct _Ball {
   Animation anim;
 } Ball;
 
-typedef struct _BallChain {
+typedef struct _BallChain
+{
   Ball balls[BALLCHAIN_MAX_LEN];
   int len;
   float speed;

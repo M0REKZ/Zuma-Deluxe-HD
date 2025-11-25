@@ -15,12 +15,14 @@
 
 #define XML_BUFF_SIZE 32678
 
-typedef struct _SpiralDot {
+typedef struct _SpiralDot
+{
   float dx, dy;
   bool t1, t2;
 } SpiralDot;
 
-typedef struct _LevelGraphics {
+typedef struct _LevelGraphics
+{
   char id[BUFF_SIZE];
 
   char spiralFile[BUFF_SIZE];
@@ -37,7 +39,8 @@ typedef struct _LevelGraphics {
   SDL_FPoint *coinsPos;
 } LevelGraphics;
 
-typedef struct _LevelSettings {
+typedef struct _LevelSettings
+{
   char id[BUFF_SIZE];
   float ballSpd;
   int ballStartCount;
@@ -49,7 +52,8 @@ typedef struct _LevelSettings {
   float slowFactor;
 } LevelSettings;
 
-typedef struct _Level {
+typedef struct _Level
+{
   int *settingsID;
   int graphicsID;
 
@@ -72,12 +76,14 @@ void Level_DrawDebug(Level *);
 char *Level_GetInfo(Level *);
 void Level_Free(Level *);
 
-typedef struct _Stage {
+typedef struct _Stage
+{
   int levelsLen;
   Level *levels;
 } Stage;
 
-typedef struct {
+typedef struct
+{
   int settingsLen;
   LevelSettings *settings;
   int graphicsLen;

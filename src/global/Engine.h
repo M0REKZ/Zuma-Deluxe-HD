@@ -21,7 +21,8 @@
 #define WINDOW_WIDTH 1280.0
 #define WINDOW_HEIGHT 720.0
 
-typedef struct _Font {
+typedef struct _Font
+{
   SDL_Texture *texture;
   int charsLen;
   char *chars;
@@ -31,13 +32,15 @@ typedef struct _Font {
 
   int kerningPairsLen;
   int kerningValuesLen;
-  struct KerningPairsStruct {
+  struct KerningPairsStruct
+  {
     char ch[2];
   } *kerningPairs;
   int *kerningValues;
 } Font;
 
-typedef struct {
+typedef struct
+{
   /* Graphics */
   SDL_Window *win;
   SDL_Renderer *render;

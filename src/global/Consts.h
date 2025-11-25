@@ -74,8 +74,12 @@ const char *filesSounds[SOUNDS_COUNT] = {
 };
 
 const char *filesSoundsSfx[SOUNDS_SFX_COUNT] = {
-    "chain1.ogg",         "chime1.ogg",    "choral1.ogg",
-    "endoflevelpop1.ogg", "gapbonus1.ogg", "lighttrail2.ogg",
+    "chain1.ogg",
+    "chime1.ogg",
+    "choral1.ogg",
+    "endoflevelpop1.ogg",
+    "gapbonus1.ogg",
+    "lighttrail2.ogg",
 };
 
 const char *filesFonts[FONTS_COUNT] = {

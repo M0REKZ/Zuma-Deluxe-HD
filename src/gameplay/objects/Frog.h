@@ -18,7 +18,8 @@
 #define FROG_BLINK_SPEED 0.25
 #define FROG_TOUNGUE_PAD 25
 
-typedef struct _Frog {
+typedef struct _Frog
+{
   float x, y;
   unsigned char nextColor, color;
   float shift, tongueShift;

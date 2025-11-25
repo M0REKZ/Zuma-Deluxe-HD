@@ -1,6 +1,7 @@
 #include "Animation.h"
 
-int Animation_Init(Animation* anim, int textureID, SDL_Rect framePos) {
+int Animation_Init(Animation *anim, int textureID, SDL_Rect framePos)
+{
     if (!anim)
         return 0;
 
@@ -23,8 +24,8 @@ int Animation_Init(Animation* anim, int textureID, SDL_Rect framePos) {
     return 1;
 }
 
-
-void Animation_Set(Animation* anim, int startFrame, int endFrame, float spd) {
+void Animation_Set(Animation *anim, int startFrame, int endFrame, float spd)
+{
     if (!anim)
         return;
 
@@ -34,26 +35,27 @@ void Animation_Set(Animation* anim, int startFrame, int endFrame, float spd) {
 
     if (anim->frame < anim->startFrame ||
         anim->frame > anim->endFrame)
-            anim->frame = anim->startFrame;
-
+        anim->frame = anim->startFrame;
 }
 
-void Animation_SetFrame(Animation* anim, int frame) {
+void Animation_SetFrame(Animation *anim, int frame)
+{
     if (!anim)
         return;
 
     anim->frame = frame;
 }
 
-void Animation_SetAngle(Animation* anim, float angle) {
+void Animation_SetAngle(Animation *anim, float angle)
+{
     if (!anim)
         return;
 
     anim->angle = angle;
 }
 
-
-void Animation_Draw(Animation* anim, float x, float y) {
+void Animation_Draw(Animation *anim, float x, float y)
+{
     if (!anim)
         return;
 
@@ -62,30 +64,28 @@ void Animation_Draw(Animation* anim, float x, float y) {
         anim->frame = anim->startFrame;
 
     if (anim->frame < anim->startFrame && anim->spd != 0)
-        anim->frame = anim->endFrame-1;
+        anim->frame = anim->endFrame - 1;
 
-    SDL_Texture* tex = Engine_GetTextureSDL(anim->textureID);
+    SDL_Texture *tex = Engine_GetTextureSDL(anim->textureID);
     SDL_Rect frame = anim->framePos;
     frame.y += (anim->framePos.h * (int)anim->frame) * anim->frameDir;
 
     SDL_FRect dRect;
-    dRect.x = x - (anim->framePos.w * anim->scale)/2;
-    dRect.y = y - (anim->framePos.h * anim->scale)/2;
+    dRect.x = x - (anim->framePos.w * anim->scale) / 2;
+    dRect.y = y - (anim->framePos.h * anim->scale) / 2;
     dRect.w = anim->framePos.w * anim->scale;
     dRect.h = anim->framePos.h * anim->scale;
 
     SDL_SetTextureColorMod(
-        tex, 
+        tex,
         anim->color.r,
         anim->color.g,
-        anim->color.b
-    );
+        anim->color.b);
 
     SDL_SetTextureAlphaMod(
-        tex, 
-        anim->color.a
-    );
-    
+        tex,
+        anim->color.a);
+
     SDL_RenderCopyExF(
         engine.render,
         tex,
@@ -93,6 +93,5 @@ void Animation_Draw(Animation* anim, float x, float y) {
         &dRect,
         anim->angle,
         NULL,
-        SDL_FLIP_NONE
-    );
+        SDL_FLIP_NONE);
 }

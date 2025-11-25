@@ -19,25 +19,27 @@
 #define DISTANCE_TO_COLLIDE 2300
 #define TO_DEGREES (180.0 / M_PI)
 
-typedef struct _Bullet {
+typedef struct _Bullet
+{
 	char color, onScreen;
 	float x, y, motionVecX, motionVecY;
 	Animation anim;
 } Bullet;
 
-typedef struct _BulletsArr {
+typedef struct _BulletsArr
+{
 	Bullet bullets[BULLETS_ARR_MAX_LEN];
 	int len;
 } BulletsArr;
 
-void Bullet_Init(Bullet*, float, float, float, float, char);
-void Bullet_Update(Bullet*);
-void Bullet_Draw(Bullet*);
+void Bullet_Init(Bullet *, float, float, float, float, char);
+void Bullet_Update(Bullet *);
+void Bullet_Draw(Bullet *);
 
-void BulletsArr_CollideWithChainUpdate(BulletsArr*, BallChain*, SpiralDot*);
-void BulletsArr_UpdateOnScreenStatus(BulletsArr*, int*);
-void BulletsArr_AddBullet(BulletsArr*, Frog*);
-void BulletsArr_Update(BulletsArr*);
-void BulletsArr_Draw(BulletsArr*);
+void BulletsArr_CollideWithChainUpdate(BulletsArr *, BallChain *, SpiralDot *);
+void BulletsArr_UpdateOnScreenStatus(BulletsArr *, int *);
+void BulletsArr_AddBullet(BulletsArr *, Frog *);
+void BulletsArr_Update(BulletsArr *);
+void BulletsArr_Draw(BulletsArr *);
 
 #endif

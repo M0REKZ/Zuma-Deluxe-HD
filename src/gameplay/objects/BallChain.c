@@ -1,7 +1,8 @@
 #include "BallChain.h"
 
 void Ball_Init(Ball *ball, float pos, float x, float y, char isPusher,
-               char color, char bonus) {
+               char color, char bonus)
+{
   (void)isPusher;
   ball->pos = pos;
   ball->x = (x + 104) * 1.5;
@@ -22,7 +23,8 @@ void Ball_Init(Ball *ball, float pos, float x, float y, char isPusher,
   Ball_InitAnim(ball);
 }
 
-void Ball_InitAnim(Ball *ball) {
+void Ball_InitAnim(Ball *ball)
+{
   SDL_Rect animBallRect = {48 * ball->color, 0, 48, 48};
   Animation_Init(&ball->anim, TEX_GAME_OBJECTS, animBallRect);
   if (ball->startAnim)
@@ -33,13 +35,16 @@ void Ball_InitAnim(Ball *ball) {
     Animation_Set(&ball->anim, 0, 50, 0);
 }
 
-void Ball_Draw(Ball *ball) {
+void Ball_Draw(Ball *ball)
+{
   if (!ball->isExploding)
     Animation_SetFrame(&ball->anim, ((int)ball->pos) % ball->anim.endFrame);
 
-  if (ball->startAnim) {
+  if (ball->startAnim)
+  {
     ball->anim.color.a += 15;
-    if (ball->anim.color.a >= 255) {
+    if (ball->anim.color.a >= 255)
+    {
       ball->anim.color.a = 255;
       ball->startAnim = false;
     }
@@ -49,7 +54,8 @@ void Ball_Draw(Ball *ball) {
   Animation_Draw(&ball->anim, ball->x, ball->y);
 }
 
-void Ball_Copy(Ball *src, Ball *dst) {
+void Ball_Copy(Ball *src, Ball *dst)
+{
   dst->x = src->x;
   dst->y = src->y;
   dst->pos = src->pos;
@@ -70,15 +76,18 @@ void Ball_Copy(Ball *src, Ball *dst) {
 
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
-int BallChain_GetLastMovingBall(BallChain *ballChain) {
-  for (int i = ballChain->len - 1; i >= 0; i--) {
+int BallChain_GetLastMovingBall(BallChain *ballChain)
+{
+  for (int i = ballChain->len - 1; i >= 0; i--)
+  {
     if (!BallChain_CollidesFront(ballChain, i, BALLS_CHAIN_PAD_ROUGH))
       return i;
   }
   return ballChain->len - 1;
 }
 
-void BallChain_Init(BallChain *ballChain, SDL_FPoint spiralstart, LevelSettings *settings) {
+void BallChain_Init(BallChain *ballChain, SDL_FPoint spiralstart, LevelSettings *settings)
+{
   ballChain->speed = settings->ballSpd;
   ballChain->maxCombo = 0;
   ballChain->isGenerating = 1;
@@ -106,16 +115,19 @@ void BallChain_Init(BallChain *ballChain, SDL_FPoint spiralstart, LevelSettings 
   ballChain->ballShadow.color.a = 128;
 }
 
-void BallChain_UpdateColorInChain(BallChain *ballChain) {
+void BallChain_UpdateColorInChain(BallChain *ballChain)
+{
   for (int i = 0; i < 6; i++)
     ballChain->colorInChain[i] = 0;
 
-  for (int i = 0; i < ballChain->len; i++) {
+  for (int i = 0; i < ballChain->len; i++)
+  {
     ballChain->colorInChain[ballChain->balls[i].color] = 1;
   }
 }
 
-char BallChain_CollidesBack(BallChain *ballChain, int idx, int collideDist) {
+char BallChain_CollidesBack(BallChain *ballChain, int idx, int collideDist)
+{
   if (idx == ballChain->len - 1)
     return 0;
 
@@ -123,7 +135,8 @@ char BallChain_CollidesBack(BallChain *ballChain, int idx, int collideDist) {
           collideDist);
 }
 
-char BallChain_CollidesFront(BallChain *ballChain, int idx, int collideDist) {
+char BallChain_CollidesFront(BallChain *ballChain, int idx, int collideDist)
+{
   if (idx == 0)
     return 0;
 
@@ -132,33 +145,39 @@ char BallChain_CollidesFront(BallChain *ballChain, int idx, int collideDist) {
 }
 
 void BallChain_Append(BallChain *ballChain, SDL_FPoint spiralstart,
-                      LevelSettings *settings) {
+                      LevelSettings *settings)
+{
   char color = '\0';
-  if(ballChain->len == 0)
-		color = randInt(0, ballChain->ballColors - 1);
-	else if (ballChain->balls[ballChain->len-1].isSingle) {
+  if (ballChain->len == 0)
+    color = randInt(0, ballChain->ballColors - 1);
+  else if (ballChain->balls[ballChain->len - 1].isSingle)
+  {
     color = ballChain->balls[ballChain->len - 1].color;
     while (color == ballChain->balls[ballChain->len - 1].color)
       color = randInt(0, ballChain->ballColors - 1);
-
-  } else if (randInt(1, 100) < settings->singleChance) {
+  }
+  else if (randInt(1, 100) < settings->singleChance)
+  {
     color = ballChain->balls[ballChain->len - 1].color;
     while (color == ballChain->balls[ballChain->len - 1].color)
       color = randInt(0, ballChain->ballColors - 1);
 
     ballChain->balls[ballChain->len].isSingle = 1;
-
-  } else if (randInt(1, 100) < settings->repeatChance) {
+  }
+  else if (randInt(1, 100) < settings->repeatChance)
+  {
     int start, end;
     BallChain_FindSubChain(ballChain, ballChain->len - 1, &start, &end);
     if (end - start + 1 < 4)
       color = ballChain->balls[ballChain->len - 1].color;
-    else {
+    else
+    {
       while (color == ballChain->balls[ballChain->len - 1].color)
         color = randInt(0, ballChain->ballColors - 1);
     }
-
-  } else {
+  }
+  else
+  {
 
     color = randInt(0, ballChain->ballColors - 1);
   }
@@ -169,21 +188,25 @@ void BallChain_Append(BallChain *ballChain, SDL_FPoint spiralstart,
 }
 
 void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
-                      unsigned int *score, Messages *msgs) {
-  //glowing is when "ZUMA" sound is played
-	if (ballChain->isGlowing) {
-		float delta = ((float)(clock() - ballChain->glowTime))/CLOCKS_PER_SEC*1.6;//tryna make it as close as possible to original
-		if (delta > BALLCHAIN_BLINK_TIME)
-			ballChain->isGlowing = 0;
-	}
-	//movement code I suppose (applies per ball duuh)
-  for (int i = ballChain->len - 1; i >= 0; i--) {
+                      unsigned int *score, Messages *msgs)
+{
+  // glowing is when "ZUMA" sound is played
+  if (ballChain->isGlowing)
+  {
+    float delta = ((float)(clock() - ballChain->glowTime)) / CLOCKS_PER_SEC * 1.6; // tryna make it as close as possible to original
+    if (delta > BALLCHAIN_BLINK_TIME)
+      ballChain->isGlowing = 0;
+  }
+  // movement code I suppose (applies per ball duuh)
+  for (int i = ballChain->len - 1; i >= 0; i--)
+  {
     Ball *ball = &ballChain->balls[i];
 
-    if(ballChain->isGlowing)
-			ball->spd= -ballChain->speed*2;
+    if (ballChain->isGlowing)
+      ball->spd = -ballChain->speed * 2;
 
-		if (i == ballChain->len-1 && !ballChain->isGlowing) {
+    if (i == ballChain->len - 1 && !ballChain->isGlowing)
+    {
       if (ballChain->speed == ROLLING_TO_PIT_SPEED)
         ball->spd = ROLLING_TO_PIT_SPEED;
       else
@@ -191,48 +214,60 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
 
       if (ball->spd > ballChain->speed)
         ball->spd = ballChain->speed;
-
-    } else {
+    }
+    else
+    {
       Ball *preBall = &ballChain->balls[i + 1];
-      if (BallChain_CollidesBack(ballChain, i, BALLS_CHAIN_PAD_ROUGH)) {
-        if (ball->goBack) {
-          for (int j = i; j < ballChain->len; j++) {
+      if (BallChain_CollidesBack(ballChain, i, BALLS_CHAIN_PAD_ROUGH))
+      {
+        if (ball->goBack)
+        {
+          for (int j = i; j < ballChain->len; j++)
+          {
             ballChain->balls[j].spd =
                 ballChain->balls[i].spd / BALL_WEIGHT_RATIO;
 
-            if (!BallChain_CollidesBack(ballChain, j, BALLS_CHAIN_PAD_ROUGH)) {
+            if (!BallChain_CollidesBack(ballChain, j, BALLS_CHAIN_PAD_ROUGH))
+            {
               Engine_PlaySound(SND_BALLCLICK1);
               break;
             }
           }
           ballChain->balls[i].spd = 0;
 
-          if (!ballChain->balls[i].isExploding && !ballChain->isEndReached) {
+          if (!ballChain->balls[i].isExploding && !ballChain->isEndReached)
+          {
             int start, end;
             BallChain_FindSubChain(ballChain, i, &start, &end);
 
-            if (end - start + 1 >= 3) {
+            if (end - start + 1 >= 3)
+            {
               BallChain_ExplodeBalls(ballChain, start, end);
               int combo = 0;
-              for (int i = start; i <= end; i++) {
-                if (ballChain->balls[i].combo) {
+              for (int i = start; i <= end; i++)
+              {
+                if (ballChain->balls[i].combo)
+                {
                   combo = ballChain->balls[i].combo;
                   break;
                 }
               }
 
-              if (end + 1 < ballChain->len) {
+              if (end + 1 < ballChain->len)
+              {
                 ballChain->balls[end + 1].combo = combo + 1;
               }
 
               int score_delta = (end - start + 1) * 10 + combo * 100;
               *score = *score + score_delta;
               char txt[MAX_MSG_LEN];
-              if (combo) {
+              if (combo)
+              {
                 sprintf(txt, "+%d\nCOMBO x%d", score_delta, combo);
                 // NEW
                 ballChain->totalCombos++;
-              } else
+              }
+              else
                 sprintf(txt, "+%d", score_delta);
 
               if (combo > ballChain->maxCombo)
@@ -244,39 +279,51 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
                   ballChain->balls[(int)(end - ((end - start + 1) / 2))].y;
               Messages_NewMsg(msgs, txt, x, y, FONT_CANCUN_FLOAT_14,
                               ballChain->balls[start].color);
-            } else {
+            }
+            else
+            {
               ballChain->balls[i + 1].combo = 0;
             }
           }
 
           ball->goBack = false;
-        } else {
+        }
+        else
+        {
           ball->spd = preBall->spd;
         }
-      } else {
-        if (ball->color == preBall->color && !ballChain->isEndReached) {
+      }
+      else
+      {
+        if (ball->color == preBall->color && !ballChain->isEndReached)
+        {
           ball->spd -= BALL_DECC;
           if (ball->spd < BALL_MAX_BACK_SPEED)
             ball->spd = BALL_MAX_BACK_SPEED;
           ball->goBack = true;
-        } else {
+        }
+        else
+        {
           ball->spd -= fmin(fabs(ball->spd), BALL_FRC) * fsign(ball->spd);
         }
       }
     }
   }
 
-  for (int i = ballChain->len - 1; i >= 0; i--) {
+  for (int i = ballChain->len - 1; i >= 0; i--)
+  {
     Ball *ball = &ballChain->balls[i];
 
-    if (ball->pos < 0) {
+    if (ball->pos < 0)
+    {
       if (ballChain->len == 1)
         ball->pos = 0;
       else
         BallChain_Destroy(ballChain, i, i);
     }
 
-    if ((int)ball->pos >= spiralLen) {
+    if ((int)ball->pos >= spiralLen)
+    {
       BallChain_Destroy(ballChain, i, i);
       ballChain->isGenerating = 0;
       ballChain->isEndReached = 1;
@@ -288,21 +335,28 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
 
     ball->pos += ball->spd;
 
-    if (i != ballChain->len - 1) {
+    if (i != ballChain->len - 1)
+    {
       Ball *pBall = &ballChain->balls[i + 1];
 
-      if (!pBall->isInserted) {
-        while (BallChain_CollidesBack(ballChain, i, BALLS_CHAIN_PAD)) {
+      if (!pBall->isInserted)
+      {
+        while (BallChain_CollidesBack(ballChain, i, BALLS_CHAIN_PAD))
+        {
           ball->pos++;
         }
-      } else {
+      }
+      else
+      {
         if (BallChain_CollidesBack(ballChain, i, BALLS_CHAIN_PAD))
           ball->pos += BALL_INSERTION_SPD;
-        else {
+        else
+        {
           int start, end;
           BallChain_FindSubChain(ballChain, i + 1, &start, &end);
 
-          if (end - start + 1 >= 3) {
+          if (end - start + 1 >= 3)
+          {
             BallChain_ExplodeBalls(ballChain, start, end);
             ballChain->chainBonus++;
             if (ballChain->maxChainBonus < ballChain->chainBonus)
@@ -326,7 +380,9 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
             float y = ballChain->balls[(int)(end - ((end - start + 1) / 2))].y;
             Messages_NewMsg(msgs, txt, x, y, FONT_CANCUN_FLOAT_14,
                             ballChain->balls[start].color);
-          } else {
+          }
+          else
+          {
             ballChain->chainBonus = 0;
           }
           pBall->isInserted = 0;
@@ -335,11 +391,13 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
     }
 
     if (i == 0 && ballChain->balls[i].isInserted &&
-        !ballChain->balls[i].isExploding) {
+        !ballChain->balls[i].isExploding)
+    {
       int start, end;
       BallChain_FindSubChain(ballChain, i, &start, &end);
 
-      if (end - start + 1 >= 3) {
+      if (end - start + 1 >= 3)
+      {
         BallChain_ExplodeBalls(ballChain, start, end);
         ballChain->chainBonus++;
         if (ballChain->maxChainBonus < ballChain->chainBonus)
@@ -363,14 +421,17 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
         float y = ballChain->balls[(int)(end - ((end - start + 1) / 2))].y;
         Messages_NewMsg(msgs, txt, x, y, FONT_CANCUN_FLOAT_14,
                         ballChain->balls[start].color);
-      } else {
+      }
+      else
+      {
         ballChain->chainBonus = 0;
       }
       ballChain->balls[i].isInserted = 0;
     }
 
     int j;
-    for (j = 0; j < (int)ball->pos; j++) {
+    for (j = 0; j < (int)ball->pos; j++)
+    {
       xx += spiral[j].dx * engine.scale_x;
       yy += spiral[j].dy * engine.scale_x;
 
@@ -387,10 +448,13 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
     ball->y = yy;
   }
 
-  for (int i = 0; i < ballChain->len; i++) {
-    if (ballChain->balls[i].isExploding) {
+  for (int i = 0; i < ballChain->len; i++)
+  {
+    if (ballChain->balls[i].isExploding)
+    {
       if (ballChain->balls[i].anim.endFrame - 1 ==
-          (int)ballChain->balls[i].anim.frame) {
+          (int)ballChain->balls[i].anim.frame)
+      {
         int start, end;
         BallChain_FindSubChain(ballChain, i, &start, &end);
         BallChain_Destroy(ballChain, start, end);
@@ -401,9 +465,11 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
   BallChain_UpdateCombos(ballChain);
 }
 
-void BallChain_UpdateCombos(BallChain *ballChain) {
+void BallChain_UpdateCombos(BallChain *ballChain)
+{
   ballChain->balls[0].combo = 0;
-  for (int i = 1; i < ballChain->len; i++) {
+  for (int i = 1; i < ballChain->len; i++)
+  {
     if ((BallChain_CollidesFront(ballChain, i, BALLS_CHAIN_PAD) &&
          !ballChain->balls[i - 1].isExploding) ||
         (!ballChain->balls[i - 1].isExploding &&
@@ -412,17 +478,20 @@ void BallChain_UpdateCombos(BallChain *ballChain) {
   }
 }
 
-void BallChain_ExplodeBalls(BallChain *ballChain, int start, int end) {
+void BallChain_ExplodeBalls(BallChain *ballChain, int start, int end)
+{
   SDL_Rect animBallRect = {395, 0, 105, 120};
   int combo = 0;
-  for (int i = start; i <= end; i++) {
+  for (int i = start; i <= end; i++)
+  {
     Animation *ballAnim = &ballChain->balls[i].anim;
     if (ballChain->balls[i].combo > combo)
       combo = ballChain->balls[i].combo;
 
     Animation_Init(ballAnim, TEX_GAME_OBJECTS, animBallRect);
 
-    switch (ballChain->balls[i].color) {
+    switch (ballChain->balls[i].color)
+    {
     case 0:
       ballAnim->color.r = 0x00;
       ballAnim->color.g = 0xFE;
@@ -461,7 +530,8 @@ void BallChain_ExplodeBalls(BallChain *ballChain, int start, int end) {
   }
 
   float comboPitch = 0;
-  switch (combo) {
+  switch (combo)
+  {
   case 0:
     Engine_PlaySound(SND_BALLSDESTROYED1);
     break;
@@ -486,58 +556,75 @@ void BallChain_ExplodeBalls(BallChain *ballChain, int start, int end) {
 }
 
 void BallChain_FindSubChain(BallChain *ballChain, int idx, int *start,
-                            int *end) {
+                            int *end)
+{
   *start = idx;
   *end = idx;
 
-  for (int i = idx; i < ballChain->len - 1; i++) {
+  for (int i = idx; i < ballChain->len - 1; i++)
+  {
     if (BallChain_CollidesBack(ballChain, i, BALLS_CHAIN_PAD_ROUGH) &&
         ballChain->balls[i].color == ballChain->balls[i + 1].color &&
         ballChain->balls[i].isExploding ==
-            ballChain->balls[i + 1].isExploding) {
+            ballChain->balls[i + 1].isExploding)
+    {
       *end = i + 1;
-    } else {
+    }
+    else
+    {
       break;
     }
   }
 
-  for (int i = idx; i > 0; i--) {
+  for (int i = idx; i > 0; i--)
+  {
     if (BallChain_CollidesFront(ballChain, i, BALLS_CHAIN_PAD_ROUGH) &&
         ballChain->balls[i].color == ballChain->balls[i - 1].color &&
         ballChain->balls[i].isExploding ==
-            ballChain->balls[i - 1].isExploding) {
+            ballChain->balls[i - 1].isExploding)
+    {
       *start = i - 1;
-    } else {
+    }
+    else
+    {
       break;
     }
   }
 }
 
-void BallChain_Destroy(BallChain *ballChain, int start, int end) {
+void BallChain_Destroy(BallChain *ballChain, int start, int end)
+{
   int amount = end - start + 1;
   ballChain->len -= amount;
-  for (int i = start; i < ballChain->len; i++) {
+  for (int i = start; i < ballChain->len; i++)
+  {
     Ball_Copy(&ballChain->balls[i + amount], &ballChain->balls[i]);
   }
 }
 
 void BallChain_Insert(BallChain *ballChain, int idx, char color,
-                      bool isInsertBack) {
+                      bool isInsertBack)
+{
   Ball curr;
   Ball prev;
 
   Ball_Copy(&ballChain->balls[idx], &prev);
-  for (int i = idx + 1; i < ballChain->len + 1; i++) {
+  for (int i = idx + 1; i < ballChain->len + 1; i++)
+  {
     Ball_Copy(&ballChain->balls[i], &curr);
     Ball_Copy(&prev, &ballChain->balls[i]);
     Ball_Copy(&curr, &prev);
   }
 
-  if (isInsertBack) {
-    if (!BallChain_CollidesBack(ballChain, idx, BALLS_CHAIN_PAD)) {
+  if (isInsertBack)
+  {
+    if (!BallChain_CollidesBack(ballChain, idx, BALLS_CHAIN_PAD))
+    {
       ballChain->balls[idx].pos =
           ballChain->balls[idx - 1].pos - BALLS_CHAIN_PAD;
-    } else {
+    }
+    else
+    {
       ballChain->balls[idx].pos = ballChain->balls[idx - 1].pos;
       ballChain->balls[idx].x = ballChain->balls[idx - 1].x;
       ballChain->balls[idx].y = ballChain->balls[idx - 1].y;
@@ -553,11 +640,14 @@ void BallChain_Insert(BallChain *ballChain, int idx, char color,
   ballChain->len++;
 }
 
-void BallChain_Draw(BallChain *ballChain, bool priorBallsOnly) {
+void BallChain_Draw(BallChain *ballChain, bool priorBallsOnly)
+{
   // Shadow
-  for (int i = 0; i < ballChain->len; i++) {
+  for (int i = 0; i < ballChain->len; i++)
+  {
     if (ballChain->balls[i].drawPrority == priorBallsOnly &&
-        !ballChain->balls[i].isExploding) {
+        !ballChain->balls[i].isExploding)
+    {
       ballChain->ballShadow.color.a = ballChain->balls[i].anim.color.a;
       if (ballChain->ballShadow.color.a > 128)
         ballChain->ballShadow.color.a = 128;
@@ -566,19 +656,23 @@ void BallChain_Draw(BallChain *ballChain, bool priorBallsOnly) {
     }
   }
   // Balls
-  for (int i = 0; i < ballChain->len; i++) {
+  for (int i = 0; i < ballChain->len; i++)
+  {
     if (ballChain->balls[i].drawPrority == priorBallsOnly)
       Ball_Draw(&ballChain->balls[i]);
   }
   // Blinking
-  if (ballChain->isGlowing) {
+  if (ballChain->isGlowing)
+  {
     Animation whiteCircle;
     SDL_Rect circleRect = {182, 2595, 48, 50};
     Animation_Init(&whiteCircle, TEX_GAME_OBJECTS, circleRect);
     whiteCircle.color.a = 128;
-    for (int i = 0; i < ballChain->len; i++) {
+    for (int i = 0; i < ballChain->len; i++)
+    {
       if (ballChain->balls[i].drawPrority == priorBallsOnly &&
-          !ballChain->balls[i].isExploding) {
+          !ballChain->balls[i].isExploding)
+      {
         Animation_Draw(&whiteCircle, ballChain->balls[i].x,
                        ballChain->balls[i].y);
       }

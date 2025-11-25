@@ -7,31 +7,36 @@
 Engine engine;
 
 // ==== Common ==== //
-void Engine_PushError(const char *header, const char *main) {
+void Engine_PushError(const char *header, const char *main)
+{
   char errMsg[STR_ERR_BUFFER_SIZE];
   sprintf(errMsg, "%s\n%s", header, main);
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errMsg, NULL);
 }
 
-void Engine_PushErrorCode(const char *header, int code) {
+void Engine_PushErrorCode(const char *header, int code)
+{
   char errMsg[STR_ERR_BUFFER_SIZE];
   sprintf(errMsg, "%s\nError code: %d", header, code);
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errMsg, NULL);
 }
 
-void Engine_PushErrorFile(const char *file, const char *main) {
+void Engine_PushErrorFile(const char *file, const char *main)
+{
   char pathMsg[STR_ERR_BUFFER_SIZE];
   sprintf(pathMsg, "Error loading file \"%s\".", file);
   Engine_PushError(pathMsg, main);
 }
 
-void Engine_PushErrorFileCode(const char *file, int code) {
+void Engine_PushErrorFileCode(const char *file, int code)
+{
   char pathMsg[STR_ERR_BUFFER_SIZE];
   sprintf(pathMsg, "Error loading file \"%s\".", file);
   Engine_PushErrorCode(pathMsg, code);
 }
 
-int Engine_Init() {
+int Engine_Init()
+{
   engine.win = NULL;
   engine.render = NULL;
   engine.textures = NULL;
@@ -49,19 +54,22 @@ int Engine_Init() {
   engine.volMus = 1.0f;
   engine.volSnd = 1.0f;
 
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
+  {
     Engine_PushError("SDL.dll graphics library initialization error:",
                      SDL_GetError());
     return 0;
   }
 
   int flags = MIX_INIT_OGG | MIX_INIT_MP3;
-  if (!(Mix_Init(flags) & flags)) {
+  if (!(Mix_Init(flags) & flags))
+  {
     Engine_PushError("SDL_mixer library initialization error:", Mix_GetError());
     return 0;
   }
 
-  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 8, 4096) < 0) {
+  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 8, 4096) < 0)
+  {
     Engine_PushError("SDL_mixer library initialization error:", Mix_GetError());
     return 0;
   }
@@ -69,7 +77,8 @@ int Engine_Init() {
   Mix_AllocateChannels(8);
 
   flags = IMG_INIT_JPG | IMG_INIT_PNG;
-  if (!(IMG_Init(flags) & flags)) {
+  if (!(IMG_Init(flags) & flags))
+  {
     Engine_PushError("SDL_Image.dll initialization error:", IMG_GetError());
     return 0;
   }
@@ -77,7 +86,8 @@ int Engine_Init() {
   return 1;
 }
 
-void Engine_Destroy() {
+void Engine_Destroy()
+{
 
   /* Graphics */
   for (unsigned int i = 0; i < engine.texturesLen; i++)
@@ -94,13 +104,15 @@ void Engine_Destroy() {
   engine.render = NULL;
 
   /* Sound and music */
-  for (size_t i = 0; i < engine.soundsLen; i++) {
+  for (size_t i = 0; i < engine.soundsLen; i++)
+  {
     Mix_FreeChunk(engine.sounds[i]);
   }
   free(engine.sounds);
   engine.sounds = NULL;
 
-  for (size_t i = 0; i < engine.soundsSfxLen; i++) {
+  for (size_t i = 0; i < engine.soundsSfxLen; i++)
+  {
     Mix_FreeChunk(engine.soundsSfx[i]);
   }
   free(engine.soundsSfx);
@@ -119,7 +131,8 @@ void Engine_Destroy() {
 /////////////////////////////////////////////////////////////////////////
 // ==== Graphics ==== //
 
-int Engine_CreateWindow(const char *cap, int w, int h) {
+int Engine_CreateWindow(const char *cap, int w, int h)
+{
   engine.win =
       SDL_CreateWindow(cap, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w,
                        h, SDL_WINDOW_OPENGL);
@@ -129,7 +142,8 @@ int Engine_CreateWindow(const char *cap, int w, int h) {
   engine.render = SDL_CreateRenderer(
       engine.win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-  if (!engine.render) {
+  if (!engine.render)
+  {
     Engine_PushError("Error while creating render:", SDL_GetError());
     return 0;
   }
@@ -139,14 +153,18 @@ int Engine_CreateWindow(const char *cap, int w, int h) {
   return 1;
 }
 
-SDL_Texture *Engine_TextureLoad(const char *fileName) {
+SDL_Texture *Engine_TextureLoad(const char *fileName)
+{
   SDL_Texture *newTexture = NULL;
 
   SDL_Surface *loadedSurface = IMG_Load(fileName);
-  if (!loadedSurface) {
+  if (!loadedSurface)
+  {
     Engine_PushErrorFile(fileName, IMG_GetError());
     return NULL;
-  } else {
+  }
+  else
+  {
     newTexture = SDL_CreateTextureFromSurface(engine.render, loadedSurface);
     if (!newTexture)
       Engine_PushErrorFile(fileName, SDL_GetError());
@@ -157,18 +175,21 @@ SDL_Texture *Engine_TextureLoad(const char *fileName) {
   return newTexture;
 }
 
-int Engine_TexturesLoad(const char **files, int n) {
+int Engine_TexturesLoad(const char **files, int n)
+{
   if (n <= 0)
     return 0;
 
   engine.textures = malloc(sizeof(SDL_Texture *) * n);
-  if (!engine.textures) {
+  if (!engine.textures)
+  {
     Engine_PushError("Critical Error!", "Out of memory.");
     return 0;
   }
 
   char path[STR_PATH_BUFFER_SIZE];
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++)
+  {
     sprintf(path, "%s/%s", TEXTURE_FOLDER, files[i]);
 
     engine.textures[i] = Engine_TextureLoad(path);
@@ -180,7 +201,8 @@ int Engine_TexturesLoad(const char **files, int n) {
   return 1;
 }
 
-SDL_Texture *Engine_GetTextureSDL(unsigned int textureID) {
+SDL_Texture *Engine_GetTextureSDL(unsigned int textureID)
+{
   if (textureID >= engine.texturesLen)
     return NULL;
 
@@ -188,9 +210,11 @@ SDL_Texture *Engine_GetTextureSDL(unsigned int textureID) {
 }
 
 /* Font */
-Font *Engine_FontLoad(const char *fileName) {
+Font *Engine_FontLoad(const char *fileName)
+{
   Font *font = malloc(sizeof(Font));
-  if (!font) {
+  if (!font)
+  {
     Engine_PushErrorFile(fileName, "Out of Memory!");
     return NULL;
   }
@@ -210,14 +234,16 @@ Font *Engine_FontLoad(const char *fileName) {
 
   sprintf(path, "%s/%s.png", FONT_FOLDER, fileName);
   font->texture = Engine_TextureLoad(path);
-  if (!font->texture) {
+  if (!font->texture)
+  {
     Engine_PushErrorFile(path, "");
     return NULL;
   }
 
   sprintf(path, "%s/%s.txt", FONT_FOLDER, fileName);
   FILE *file = fopen(path, "r");
-  if (!file) {
+  if (!file)
+  {
     Engine_PushErrorFile(path, "");
     return NULL;
   }
@@ -226,106 +252,138 @@ Font *Engine_FontLoad(const char *fileName) {
   int errFlag = 0;
   char str[64];
 
-  while (fscanf(file, "%s", str) != EOF) {
-    if (!fscanf(file, "%d", &n)) {
+  while (fscanf(file, "%s", str) != EOF)
+  {
+    if (!fscanf(file, "%d", &n))
+    {
       errFlag = 1;
       break;
     }
 
-    if (strcmp(str, "CharList") == 0) {
+    if (strcmp(str, "CharList") == 0)
+    {
       font->chars = (char *)malloc(sizeof(char) * n);
-      if (!font->chars) {
+      if (!font->chars)
+      {
         errFlag = 1;
         break;
       }
 
       font->charsLen = n;
-      for (int i = 0; i < n; i++) {
+      for (int i = 0; i < n; i++)
+      {
         char temp;
-        if (!fscanf(file, " %c", &temp)) {
+        if (!fscanf(file, " %c", &temp))
+        {
           errFlag = 1;
           break;
         }
         font->chars[i] = temp;
       }
-    } else if (strcmp(str, "WidthList") == 0) {
+    }
+    else if (strcmp(str, "WidthList") == 0)
+    {
       font->widthList = malloc(sizeof(int) * n);
-      if (!font->widthList) {
+      if (!font->widthList)
+      {
         errFlag = 1;
         break;
       }
 
-      for (int i = 0; i < n; i++) {
+      for (int i = 0; i < n; i++)
+      {
         int temp;
-        if (!fscanf(file, "%d", &temp)) {
+        if (!fscanf(file, "%d", &temp))
+        {
           errFlag = 1;
           break;
         }
         font->widthList[i] = temp;
       }
-    } else if (strcmp(str, "RectList") == 0) {
+    }
+    else if (strcmp(str, "RectList") == 0)
+    {
       font->rectList = malloc(sizeof(SDL_Rect) * n);
-      if (!font->rectList) {
+      if (!font->rectList)
+      {
         errFlag = 1;
         break;
       }
 
-      for (int i = 0; i < n; i++) {
+      for (int i = 0; i < n; i++)
+      {
         SDL_Rect temp;
         if (fscanf(file, "%d %d %d %d", &temp.x, &temp.y, &temp.w, &temp.h) !=
-            4) {
+            4)
+        {
           errFlag = 1;
           break;
         }
         font->rectList[i] = temp;
       }
-    } else if (strcmp(str, "OffsetList") == 0) {
+    }
+    else if (strcmp(str, "OffsetList") == 0)
+    {
       font->offsetList = malloc(sizeof(SDL_Point) * n);
-      if (!font->offsetList) {
+      if (!font->offsetList)
+      {
         errFlag = 1;
         break;
       }
 
-      for (int i = 0; i < n; i++) {
+      for (int i = 0; i < n; i++)
+      {
         SDL_Point temp;
-        if (fscanf(file, "%d%d", &temp.x, &temp.y) != 2) {
+        if (fscanf(file, "%d%d", &temp.x, &temp.y) != 2)
+        {
           errFlag = 1;
           break;
         }
         font->offsetList[i] = temp;
       }
-    } else if (strcmp(str, "KerningPairs") == 0) {
+    }
+    else if (strcmp(str, "KerningPairs") == 0)
+    {
       font->kerningPairs = malloc(sizeof(struct KerningPairsStruct) * n);
-      if (!font->kerningPairs) {
+      if (!font->kerningPairs)
+      {
         errFlag = 1;
         break;
       }
 
       font->kerningPairsLen = n;
 
-      for (int i = 0; i < n; i++) {
+      for (int i = 0; i < n; i++)
+      {
         char temp[3];
-        if (!fscanf(file, " %2s\n", temp)) {
+        if (!fscanf(file, " %2s\n", temp))
+        {
           errFlag = 1;
           break;
         }
         font->kerningPairs[i].ch[0] = temp[0];
         font->kerningPairs[i].ch[1] = temp[1];
 
-        while(getc(file) != '\n'); //skip useless characters until new line
+        while (getc(file) != '\n')
+          ; // skip useless characters until new line
       }
-    } else if (strcmp(str, "KerningValues") == 0) {
+    }
+    else if (strcmp(str, "KerningValues") == 0)
+    {
       font->kerningValues = malloc(sizeof(int) * n);
-      if (!font->kerningValues) {
+      if (!font->kerningValues)
+      {
         errFlag = 1;
         break;
       }
 
       font->kerningValuesLen = n;
 
-      for (int i = 0; i < n; i++) {
+      for (int i = 0; i < n; i++)
+      {
         int temp;
-        if (!fscanf(file, "%d", &temp)) {
+        if (!fscanf(file, "%d", &temp))
+        {
           errFlag = 1;
           break;
         }
@@ -335,7 +393,8 @@ Font *Engine_FontLoad(const char *fileName) {
   }
   fclose(file);
 
-  if (errFlag) {
+  if (errFlag)
+  {
     free(font);
     Engine_PushErrorFile(fileName, "");
     return NULL;
@@ -344,7 +403,8 @@ Font *Engine_FontLoad(const char *fileName) {
   return font;
 }
 
-void Engine_FontFree(Font *font) {
+void Engine_FontFree(Font *font)
+{
   SDL_DestroyTexture(font->texture);
   free(font->chars);
   free(font->widthList);
@@ -356,14 +416,17 @@ void Engine_FontFree(Font *font) {
   free(font);
 }
 
-int Engine_FontsLoad(const char **files, int n) {
+int Engine_FontsLoad(const char **files, int n)
+{
   engine.fonts = malloc(sizeof(Font) * n);
-  if (!engine.fonts) {
+  if (!engine.fonts)
+  {
     Engine_PushError("Critical Error!", "Out of memory.");
     return 0;
   }
 
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++)
+  {
     engine.fonts[i] = Engine_FontLoad(files[i]);
     if (!engine.fonts[i])
       return 0;
@@ -374,7 +437,8 @@ int Engine_FontsLoad(const char **files, int n) {
 }
 
 /* Draw */
-void Engine_DrawTexture(unsigned int texID, float x, float y) {
+void Engine_DrawTexture(unsigned int texID, float x, float y)
+{
   if (texID >= engine.texturesLen)
     return;
 
@@ -386,7 +450,8 @@ void Engine_DrawTexture(unsigned int texID, float x, float y) {
 }
 
 void Engine_DrawTextureWithRot(unsigned int texID, float x, float y,
-                               float angle) {
+                               float angle)
+{
   if (texID >= engine.texturesLen)
     return;
 
@@ -398,7 +463,8 @@ void Engine_DrawTextureWithRot(unsigned int texID, float x, float y,
                     NULL, SDL_FLIP_NONE);
 }
 
-void Engine_DrawTextureSDL(SDL_Texture *tex, float x, float y) {
+void Engine_DrawTextureSDL(SDL_Texture *tex, float x, float y)
+{
   int w, h;
   SDL_QueryTexture(tex, NULL, NULL, &w, &h);
   SDL_FRect rect = {x - (w / 2), y - (h / 2), w, h};
@@ -407,7 +473,8 @@ void Engine_DrawTextureSDL(SDL_Texture *tex, float x, float y) {
 }
 
 void Engine_DrawTextScale(const char *str, unsigned int fontID, float scale,
-                          float x, float y) {
+                          float x, float y)
+{
   if (fontID >= engine.fontsLen)
     return;
 
@@ -415,26 +482,32 @@ void Engine_DrawTextScale(const char *str, unsigned int fontID, float scale,
   int width = 0;
   int height = 0;
   Font *font = engine.fonts[fontID];
-  while (str[i] != '\0') {
-    if (str[i] == '\n') {
+  while (str[i] != '\0')
+  {
+    if (str[i] == '\n')
+    {
       width = 0;
       height += font->rectList[0].h;
     }
-    if (str[i] == ' ') {
+    if (str[i] == ' ')
+    {
       width += font->widthList[0];
     }
 
-    for (int j = 0; j < font->charsLen; j++) {
-      if (str[i] == font->chars[j]) {
-        for (int k = 0; k < font->kerningPairsLen; k++) {
+    for (int j = 0; j < font->charsLen; j++)
+    {
+      if (str[i] == font->chars[j])
+      {
+        for (int k = 0; k < font->kerningPairsLen; k++)
+        {
           if (str[i] == font->kerningPairs[k].ch[0] &&
               str[i + 1] == font->kerningPairs[k].ch[1])
-              {
-                if(k < font->kerningValuesLen)
-                  width += font->kerningValues[k];
-                else
-                  width++;
-              }
+          {
+            if (k < font->kerningValuesLen)
+              width += font->kerningValues[k];
+            else
+              width++;
+          }
         }
 
         SDL_FRect rect = {
@@ -455,11 +528,13 @@ void Engine_DrawTextScale(const char *str, unsigned int fontID, float scale,
   }
 }
 
-void Engine_DrawText(const char *str, unsigned int fontID, float x, float y) {
+void Engine_DrawText(const char *str, unsigned int fontID, float x, float y)
+{
   Engine_DrawTextScale(str, fontID, 1, x, y);
 }
 
-int Engine_GetTextWidth(const char *str, unsigned int fontID) {
+int Engine_GetTextWidth(const char *str, unsigned int fontID)
+{
   if (fontID >= engine.fontsLen)
     return 0;
 
@@ -469,28 +544,34 @@ int Engine_GetTextWidth(const char *str, unsigned int fontID) {
   int dWidth = 0;
   Font *font = engine.fonts[fontID];
 
-  while (str[i] != '\0') {
-    if (str[i] == '\n') {
+  while (str[i] != '\0')
+  {
+    if (str[i] == '\n')
+    {
       if (maxWidth < dWidth)
         maxWidth = dWidth;
 
       width = 0;
     }
-    if (str[i] == ' ') {
+    if (str[i] == ' ')
+    {
       width += font->widthList[0];
     }
 
-    for (int j = 0; j < font->charsLen; j++) {
-      if (str[i] == font->chars[j]) {
-        for (int k = 0; k < font->kerningPairsLen; k++) {
+    for (int j = 0; j < font->charsLen; j++)
+    {
+      if (str[i] == font->chars[j])
+      {
+        for (int k = 0; k < font->kerningPairsLen; k++)
+        {
           if (str[i] == font->kerningPairs[k].ch[0] &&
               str[i + 1] == font->kerningPairs[k].ch[1])
-            {
-                if(k < font->kerningValuesLen)
-                  width += font->kerningValues[k];
-                else
-                  width++;
-              }
+          {
+            if (k < font->kerningValuesLen)
+              width += font->kerningValues[k];
+            else
+              width++;
+          }
         }
 
         width += font->widthList[j];
@@ -509,14 +590,16 @@ int Engine_GetTextWidth(const char *str, unsigned int fontID) {
 }
 
 void Engine_DrawTextExt(const char *str, int fontID, SDL_Color color,
-                        bool drawShadow, bool center, float x, float y) {
+                        bool drawShadow, bool center, float x, float y)
+{
   Font *font = engine.fonts[fontID];
 
   int dx = 0;
   if (center)
     dx = Engine_GetTextWidth(str, fontID) / 2;
 
-  if (drawShadow) {
+  if (drawShadow)
+  {
     SDL_SetTextureColorMod(font->texture, 0, 0, 0);
     SDL_SetTextureAlphaMod(font->texture, 192);
     Engine_DrawText(str, fontID, x - dx + 1, y - 1);
@@ -532,14 +615,16 @@ void Engine_DrawTextExt(const char *str, int fontID, SDL_Color color,
 
 void Engine_DrawTextExtScale(const char *str, int fontID, float scale,
                              SDL_Color color, bool drawShadow, bool center,
-                             float x, float y) {
+                             float x, float y)
+{
   Font *font = engine.fonts[fontID];
 
   int dx = 0;
   if (center)
     dx = (Engine_GetTextWidth(str, fontID) / 2) * scale;
 
-  if (drawShadow) {
+  if (drawShadow)
+  {
     SDL_SetTextureColorMod(font->texture, 0, 0, 0);
     SDL_SetTextureAlphaMod(font->texture, 192);
     Engine_DrawTextScale(str, fontID, scale, x - dx + 1, y - 1);
@@ -557,11 +642,13 @@ void Engine_DrawTextExtScale(const char *str, int fontID, float scale,
 /////////////////////////////////////////////////////////////////////////
 // ==== Sound And Music ==== //
 
-int Engine_MusicLoad(const char *fileName) {
+int Engine_MusicLoad(const char *fileName)
+{
   char path[STR_PATH_BUFFER_SIZE];
   sprintf(path, "%s/%s", MUSIC_FOLDER, fileName);
   engine.music = Mix_LoadMUS(path);
-  if (!engine.music) {
+  if (!engine.music)
+  {
     Engine_PushErrorFile(fileName, Mix_GetError());
     return 0;
   }
@@ -569,9 +656,11 @@ int Engine_MusicLoad(const char *fileName) {
   return 1;
 }
 
-Mix_Chunk *Engine_SoundLoad(const char *fileName) {
+Mix_Chunk *Engine_SoundLoad(const char *fileName)
+{
   Mix_Chunk *sound = Mix_LoadWAV(fileName);
-  if (!sound) {
+  if (!sound)
+  {
     Engine_PushErrorFile(fileName, Mix_GetError());
     return 0;
   }
@@ -579,17 +668,20 @@ Mix_Chunk *Engine_SoundLoad(const char *fileName) {
   return sound;
 }
 
-int Engine_SoundsLoad(const char **files, uint32_t n) {
+int Engine_SoundsLoad(const char **files, uint32_t n)
+{
   if (n <= 0)
     return 0;
 
   engine.sounds = (Mix_Chunk **)malloc(sizeof(Mix_Chunk *) * n);
-  if (!engine.sounds) {
+  if (!engine.sounds)
+  {
     Engine_PushError("Critical Error!", "Out of memory.");
     return 0;
   }
 
-  for (size_t i = 0; i < n; i++) {
+  for (size_t i = 0; i < n; i++)
+  {
     char path[STR_PATH_BUFFER_SIZE];
     sprintf(path, "%s/%s", SOUND_FOLDER, files[i]);
 
@@ -602,10 +694,12 @@ int Engine_SoundsLoad(const char **files, uint32_t n) {
   return 1;
 }
 
-Mix_Chunk *Engine_SoundSfxLoad(const char *fileName) {
+Mix_Chunk *Engine_SoundSfxLoad(const char *fileName)
+{
   Mix_Chunk *sound = Mix_LoadWAV(fileName);
 
-  if (!sound) {
+  if (!sound)
+  {
     Engine_PushErrorFile(fileName, Mix_GetError());
     return 0;
   }
@@ -613,17 +707,20 @@ Mix_Chunk *Engine_SoundSfxLoad(const char *fileName) {
   return sound;
 }
 
-int Engine_SoundsSfxLoad(const char **files, uint32_t n) {
+int Engine_SoundsSfxLoad(const char **files, uint32_t n)
+{
   if (n <= 0)
     return 0;
 
   engine.soundsSfx = (Mix_Chunk **)malloc(sizeof(Mix_Chunk *) * n);
-  if (!engine.soundsSfx) {
+  if (!engine.soundsSfx)
+  {
     Engine_PushError("Critical Error!", "Out of memory.");
     return 0;
   }
 
-  for (size_t i = 0; i < n; i++) {
+  for (size_t i = 0; i < n; i++)
+  {
     char path[STR_PATH_BUFFER_SIZE];
     sprintf(path, "%s/%s", SOUND_FOLDER, files[i]);
 
@@ -636,14 +733,16 @@ int Engine_SoundsSfxLoad(const char **files, uint32_t n) {
   return 1;
 }
 
-Mix_Chunk *Engine_GetSoundSample(uint32_t soundID) {
+Mix_Chunk *Engine_GetSoundSample(uint32_t soundID)
+{
   if (soundID >= engine.soundsLen)
     return 0;
 
   return engine.sounds[soundID];
 }
 
-void Engine_PlayMusic(uint32_t musicID) {
+void Engine_PlayMusic(uint32_t musicID)
+{
   (void)musicID;
   Mix_FadeInMusic(engine.music, -1, 1000);
   Mix_VolumeMusic(MIX_MAX_VOLUME * engine.volMus);
@@ -651,7 +750,8 @@ void Engine_PlayMusic(uint32_t musicID) {
 
 void Engine_StopMusic() { Mix_PauseMusic(); }
 
-void Engine_PlaySound(uint32_t soundID) {
+void Engine_PlaySound(uint32_t soundID)
+{
   if (soundID >= engine.soundsLen)
     return;
 
@@ -659,21 +759,24 @@ void Engine_PlaySound(uint32_t soundID) {
   Mix_PlayChannel(SOUNDS_CHANNEL, engine.sounds[soundID], 1);
 }
 
-void Engine_StopSound(uint32_t soundID) {
+void Engine_StopSound(uint32_t soundID)
+{
   if (soundID >= engine.soundsLen)
     return;
 
   Mix_HaltChannel(SOUNDS_CHANNEL);
 }
 
-void Engine_PlaySoundSfxPitch(int soundID, float pitch) {
+void Engine_PlaySoundSfxPitch(int soundID, float pitch)
+{
   (void)pitch;
   // TODO: pitch
   Mix_VolumeChunk(engine.soundsSfx[soundID], MIX_MAX_VOLUME * engine.volSnd);
   Mix_PlayChannel(SFX_CHANNEL, engine.soundsSfx[soundID], 1);
 }
 
-void Engine_StopSoundSfx(int soundID) {
+void Engine_StopSoundSfx(int soundID)
+{
   (void)soundID;
 
   Mix_HaltChannel(SFX_CHANNEL);
@@ -683,7 +786,8 @@ void Engine_StopSoundSfx(int soundID) {
 /////////////////////////////////////////////////////////////////////////
 /* ==== Misc ==== */
 
-void Engine_GetMousePos(int *mx, int *my) {
+void Engine_GetMousePos(int *mx, int *my)
+{
   int wWidth, wHeight;
   int _mx, _my;
 
@@ -696,11 +800,13 @@ void Engine_GetMousePos(int *mx, int *my) {
   *my = _my;
 }
 
-int randInt(const int min, const int max) {
+int randInt(const int min, const int max)
+{
   return rand() % (max - min + 1) + min;
 }
 
-float fsign(float x) {
+float fsign(float x)
+{
   if (x > 0)
     return 1.0;
   else if (x < 0)
@@ -709,16 +815,19 @@ float fsign(float x) {
     return 0;
 }
 
-float lerp(float start, float end, float val) {
+float lerp(float start, float end, float val)
+{
 
   return start + val * (end - start);
 }
 
 // ==== Saved data ==== //
-int Engine_SaveSettings() {
+int Engine_SaveSettings()
+{
   FILE *file;
   file = fopen("settings.txt", "w");
-  if (!file) {
+  if (!file)
+  {
     Engine_PushError("File save error",
                      "Unable to write file \"settings.txt\"");
     return 0;
@@ -736,26 +845,32 @@ int Engine_SaveSettings() {
   return 1;
 }
 
-int Engine_LoadSettings() {
+int Engine_LoadSettings()
+{
   FILE *file;
   file = fopen("settings.txt", "r");
-  if (!file) {
+  if (!file)
+  {
     Engine_SaveSettings();
     return 1;
   }
 
   char buff[11];
   fscanf(file, "%s", buff);
-  if (strcmp(buff, "MUSIC") != 0) {
+  if (strcmp(buff, "MUSIC") != 0)
+  {
     Engine_PushError("Failed to load \"settings.txt\"", "Invalid file format!");
     fclose(file);
     return 0;
   }
 
   int mus = -1;
-  if (fscanf(file, "%d", &mus) == 1 && mus >= 0 && mus <= 100) {
+  if (fscanf(file, "%d", &mus) == 1 && mus >= 0 && mus <= 100)
+  {
     engine.volMus = (float)mus / 100.0f;
-  } else {
+  }
+  else
+  {
     Engine_PushError("Failed to load \"settings.txt\"",
                      "Invalid parameter value MUSIC.");
     fclose(file);
@@ -763,16 +878,20 @@ int Engine_LoadSettings() {
   }
 
   fscanf(file, "%s", buff);
-  if (strcmp(buff, "SOUNDS") != 0) {
+  if (strcmp(buff, "SOUNDS") != 0)
+  {
     Engine_PushError("Failed to load \"settings.txt\"", "Invalid file format!");
     fclose(file);
     return 0;
   }
 
   int snd = -1;
-  if (fscanf(file, "%d", &snd) == 1 && snd >= 0 && snd <= 100) {
+  if (fscanf(file, "%d", &snd) == 1 && snd >= 0 && snd <= 100)
+  {
     engine.volSnd = (float)snd / 100.0f;
-  } else {
+  }
+  else
+  {
     Engine_PushError("Failed to load \"settings.txt\"",
                      "Invalid parameter value SOUNDS.");
     fclose(file);
@@ -780,19 +899,24 @@ int Engine_LoadSettings() {
   }
 
   fscanf(file, "%s", buff);
-  if (strcmp(buff, "FULLSCREEN") != 0) {
+  if (strcmp(buff, "FULLSCREEN") != 0)
+  {
     Engine_PushError("Failed to load \"settings.txt\"", "Invalid file format!");
     fclose(file);
     return 0;
   }
 
   int full = -1;
-  if (fscanf(file, "%d", &full) == 1 && full >= 0 && full <= 1) {
+  if (fscanf(file, "%d", &full) == 1 && full >= 0 && full <= 1)
+  {
     engine.fullScr = full;
-    if (engine.fullScr) {
+    if (engine.fullScr)
+    {
       SDL_SetWindowFullscreen(engine.win, SDL_WINDOW_FULLSCREEN);
     }
-  } else {
+  }
+  else
+  {
     Engine_PushError("Failed to load \"settings.txt\"",
                      "Invalid parameter value FULLSCREEN.");
     fclose(file);

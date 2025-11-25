@@ -23,7 +23,8 @@
 #define SLOWFACTOR_POS 0.8
 #define PIT_OPEN_POS 0.2
 
-typedef struct _Treasure {
+typedef struct _Treasure
+{
   int pos;
   int totalCoins;
 
@@ -34,7 +35,8 @@ typedef struct _Treasure {
   clock_t time;
   Animation anim;
 } Treasure;
-typedef struct _Game {
+typedef struct _Game
+{
   int mx, my, stageID, lvlID, lives, difficulty;
   unsigned int score;
   int ballsOnStart;

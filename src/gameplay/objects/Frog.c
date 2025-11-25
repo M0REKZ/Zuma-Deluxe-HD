@@ -2,7 +2,8 @@
 
 #define TO_DEGREES (180.0 / M_PI)
 
-void Frog_Init(Frog *frog, float x, float y) {
+void Frog_Init(Frog *frog, float x, float y)
+{
   frog->nextColor = 1;
   frog->color = 0;
   frog->x = x;
@@ -19,7 +20,8 @@ void Frog_Init(Frog *frog, float x, float y) {
   Animation_Set(&frog->eyesAnim, 0, 4, 0);
 }
 
-void Frog_Rotate(Frog *frog, int mx, int my) {
+void Frog_Rotate(Frog *frog, int mx, int my)
+{
   double vecX = mx - frog->x;
   double vecY = my - frog->y;
 
@@ -33,16 +35,19 @@ void Frog_Rotate(Frog *frog, int mx, int my) {
   frog->forwardY = vecY;
 }
 
-void Frog_Draw(Frog *frog, bool introEnd) {
+void Frog_Draw(Frog *frog, bool introEnd)
+{
   float frogX = frog->x;
   float frogY = frog->y;
 
-  if (frog->isShooted) {
+  if (frog->isShooted)
+  {
     frog->shift = FROG_SHIFT_ON_SHOOT;
     frog->tongueShift = FROG_TONGUE_SHIFT_ON_SHOOT;
   }
 
-  if (frog->shift > 0) {
+  if (frog->shift > 0)
+  {
     frogX -= frog->forwardX * frog->shift;
     frogY -= frog->forwardY * frog->shift;
     frog->shift -= FROG_REVERT_SPEED;
@@ -76,7 +81,8 @@ void Frog_Draw(Frog *frog, bool introEnd) {
       &anim, frogX + frog->forwardX * (FROG_TOUNGUE_PAD - frog->tongueShift),
       frogY + frog->forwardY * (FROG_TOUNGUE_PAD - frog->tongueShift));
 
-  if (introEnd) {
+  if (introEnd)
+  {
     // Drawing  currentBall
     SDL_Rect animBallRect = {48 * frog->color, 0, 48, 48};
     Animation_Init(&anim, TEX_GAME_OBJECTS, animBallRect);
@@ -99,14 +105,16 @@ void Frog_Draw(Frog *frog, bool introEnd) {
 
   // Drawing TopBodyLayer
   anim.scale = 1;
-  if (frog->isShooted) {
+  if (frog->isShooted)
+  {
     Animation_Set(&frog->eyesAnim, 0, 3, FROG_BLINK_SPEED);
   }
 
   Animation_SetAngle(&frog->eyesAnim, frog->rotation);
   Animation_Draw(&frog->eyesAnim, frogX, frogY);
 
-  if (frog->eyesAnim.frame == 0) {
+  if (frog->eyesAnim.frame == 0)
+  {
     Animation_Set(&frog->eyesAnim, 0, 3, 0);
     Animation_SetFrame(&frog->eyesAnim, 0);
   }
