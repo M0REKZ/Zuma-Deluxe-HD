@@ -61,8 +61,8 @@ void Ball_InitAnim(Ball *);
 void Ball_Copy(Ball *, Ball *);
 void Ball_Draw(Ball *);
 
-void BallChain_Init(BallChain *, Level *, LevelSettings *);
-void BallChain_Append(BallChain *, Level *, LevelSettings *);
+void BallChain_Init(BallChain *, SDL_FPoint spiralstart, LevelSettings *);
+void BallChain_Append(BallChain *, SDL_FPoint spiralstart, LevelSettings *);
 void BallChain_FindSubChain(BallChain *, int, int *, int *);
 void BallChain_Destroy(BallChain *, int, int);
 void BallChain_Insert(BallChain *, int, char, bool);

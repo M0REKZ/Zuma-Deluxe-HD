@@ -63,7 +63,16 @@ void Game_Init(Game *game, int lvlID, int difficulty) {
   Frog_Init(&game->frog, (game->graphics->frogPos.x + 106) * engine.scale_x,
             game->graphics->frogPos.y * engine.scale_y);
 
-  BallChain_Init(&game->chain, game->lvl, game->settings);
+  BallChain_Init(&game->chain[0], game->lvl->spiralStart, game->settings);
+  if(game->lvl->spiral2)
+  {
+		BallChain_Init(&game->chain[1], game->lvl->spiral2Start, game->settings);
+		game->chain[1].isGenerating=true;
+	}
+  else
+  {
+    game->chain[1].isGenerating = false;
+  }
 
   for (int i = 0; i < BULLETS_ARR_MAX_LEN; i++)
     game->bullets.bullets[i].onScreen = 0;
@@ -80,7 +89,7 @@ void Game_Init(Game *game, int lvlID, int difficulty) {
   game->DEBUG = false;
   game->isRunning = true;
   game->isFirstTime = true;
-  game->chain.isGenerating = true;
+  game->chain[0].isGenerating = true;
 
   //////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////
@@ -114,6 +123,20 @@ void Game_Init(Game *game, int lvlID, int difficulty) {
     game->finishPos.y += game->lvl->spiral[i].dy * engine.scale_y;
   }
 
+  //finish2
+  if(game->lvl->spiral2)
+  {
+		Animation_Init(&game->finish2Anim, TEX_GAME_OBJECTS, animFinishRect);
+	    Animation_Set(&game->finish2Anim, 0, 12, 0);
+	
+	    game->finish2Pos.x = (game->lvl->spiral2Start.x + 104)*engine.scale_x;
+	    game->finish2Pos.y = game->lvl->spiral2Start.y*engine.scale_y;
+	    for (int i = 0; i < game->lvl->spiral2Len; i++) {
+	        game->finish2Pos.x += game->lvl->spiral2[i].dx * engine.scale_x;
+	        game->finish2Pos.y += game->lvl->spiral2[i].dy * engine.scale_y;
+	    }
+	}
+
   game->scoreRect.x = 773;
   game->scoreRect.y = 28;
   game->scoreRect.w = 0;
@@ -143,8 +166,17 @@ static bool _Game_FrogControl(Game *game, int mouseClicked) {
 
   switch (mouseClicked) {
   case 1:
-    if (!isShooted && !game->chain.isEndReached && !game->isFirstTime)
-      isShooted = true;
+     if (!isShooted && !game->chain[0].isEndReached && !game->isFirstTime)
+     {
+				//isShooted=true is all it was here before adding second chain :P 
+				if(game->lvl->spiral2)
+        {
+					if(!game->chain[1].isEndReached)
+						isShooted=true;
+				}
+        else
+          isShooted = true;
+			}
     break;
   case 2: {
     char t = game->frog.color;
@@ -222,41 +254,49 @@ static bool _Game_HandleMenu(Game *game, int *inMenu) {
   return true;
 }
 
-static void _Game_GenerateChain(Game *game) {
-  game->chain.speed = game->settings->ballSpd;
+static void _Game_GenerateChain(Game* game, int n) {
+    game->chain[n].speed = game->settings->ballSpd;
 
-  if (!game->chain.isGenerating)
-    return;
+    if (!game->chain[n].isGenerating)
+        return;
 
-  if (game->isFirstTime && game->chain.len < game->settings->ballStartCount) {
-    if (game->chain.balls[game->chain.len - 1].pos >= 0.5) {
-      BallChain_Append(&game->chain, game->lvl, game->settings);
-      game->chain.balls[game->chain.len - 1].spd =
-          game->chain.balls[game->chain.len - 2].spd;
-    }
-  } else {
-    if (game->chain.balls[game->chain.len - 1].pos >= BALLS_CHAIN_PAD) {
-      BallChain_Append(&game->chain, game->lvl, game->settings);
-      game->chain.balls[game->chain.len - 1].spd =
-          game->chain.balls[game->chain.len - 2].spd;
-      game->chain.balls[game->chain.len - 1].startAnim = true;
-      Ball_InitAnim(&game->chain.balls[game->chain.len - 1]);
-    } else if (game->chain.len == 0) {
-      BallChain_Append(&game->chain, game->lvl, game->settings);
+    if (game->isFirstTime && game->chain[n].len < game->settings->ballStartCount) {
+        if (game->chain[n].balls[game->chain[n].len-1].pos >= 0.5) {
+            BallChain_Append(&game->chain[n], game->lvl->spiralStart, game->settings);
+            game->chain[n].balls[game->chain[n].len-1].spd = game->chain[n].balls[game->chain[n].len-2].spd;
+        }
+    } else {
+        if (game->chain[n].balls[game->chain[n].len-1].pos >= BALLS_CHAIN_PAD) {
+            BallChain_Append(&game->chain[n], game->lvl->spiralStart, game->settings);
+            game->chain[n].balls[game->chain[n].len-1].spd = game->chain[n].balls[game->chain[n].len-2].spd;
+            game->chain[n].balls[game->chain[n].len-1].startAnim = true;
+            Ball_InitAnim(&game->chain[n].balls[game->chain[n].len-1]);
+        } else if (game->chain[n].len == 0) {
+            BallChain_Append(&game->chain[n], game->lvl->spiralStart, game->settings);
+        }
+
+        if (game->isFirstTime) {
+            Engine_StopSound(SND_ROLLING);
+        }
+        game->isFirstTime = false;
     }
 
-    if (game->isFirstTime) {
-      Engine_StopSound(SND_ROLLING);
-    }
-    game->isFirstTime = false;
-  }
 }
 
 static void _Game_HandleGameWon(Game *game) {
-  if (game->chain.isEndReached || game->chain.len != 0 ||
-      game->score <= game->settings->gaugeScore || game->isWon) {
-    return;
-  }
+  if (game->chain[0].isEndReached || 
+        game->chain[0].len != 0 || 
+        game->score <= game->settings->gaugeScore ||
+        game->isWon
+    )
+    {
+        return;
+    }
+    if(game->lvl->spiral2!=NULL)
+    {
+			if (game->chain[1].isEndReached || game->chain[1].len != 0)
+				return;
+	} 
 
   Engine_PlayMusic(MUS_WIN);
 
@@ -269,13 +309,23 @@ static void _Game_HandleGameWon(Game *game) {
   sprintf(buff, "%d", game->totalCoins);
   DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_COINS, buff);
 
-  sprintf(buff, "%d", game->chain.totalCombos);
+  int totalCombos = game->chain[0].totalCombos;
+	int maxChainBonus = game->chain[0].maxChainBonus;
+	int maxCombo = game->chain[0].maxCombo;
+	if(game->lvl->spiral2)
+  {
+		totalCombos += game->chain[1].totalCombos;
+		maxChainBonus += game->chain[1].maxChainBonus;
+		maxCombo += game->chain[1].maxCombo;
+	}
+
+  sprintf(buff, "%d", totalCombos);
   DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_COMBOS, buff);
 
-  sprintf(buff, "%d", game->chain.maxChainBonus);
+  sprintf(buff, "%d", maxChainBonus);
   DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_MAX_CHAIN, buff);
 
-  sprintf(buff, "%d", game->chain.maxCombo);
+  sprintf(buff, "%d", maxCombo);
   DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_MAX_COMBO, buff);
 
   game->time = ((float)clock()) / CLOCKS_PER_SEC - game->time;
@@ -296,8 +346,16 @@ static void _Game_HandleGameWon(Game *game) {
 }
 
 static bool _Game_IsGameLose(Game *game) {
-  if (!(game->chain.len == 0 && game->chain.isEndReached))
-    return false;
+  if (!(game->chain[0].len == 0 && game->chain[0].isEndReached))
+  {
+		if(game->lvl->spiral2)
+    {
+			if (!(game->chain[1].len == 0 && game->chain[1].isEndReached))
+				return false;
+		}
+    else
+			return false;
+	}
 
   if (game->lives >= 1) {
     int lives = game->lives - 1;
@@ -320,14 +378,26 @@ static bool _Game_IsGameLose(Game *game) {
   sprintf(buff, "%d", game->totalCoins);
   DialogueBox_SetTextStr(game->dbGameOver, DB_GO_TEXT_COINS, buff);
 
-  sprintf(buff, "%d", game->chain.totalCombos);
-  DialogueBox_SetTextStr(game->dbGameOver, DB_GO_TEXT_COMBOS, buff);
+  int totalCombos = game->chain[0].totalCombos;
+	int maxChainBonus = game->chain[0].maxChainBonus;
+	int maxCombo = game->chain[0].maxCombo;
+	if(game->lvl->spiral2 != NULL){
+		totalCombos += game->chain[1].totalCombos;
+		maxChainBonus += game->chain[1].maxChainBonus;
+		maxCombo += game->chain[1].maxCombo;
+	}
 
-  sprintf(buff, "%d", game->chain.maxChainBonus);
-  DialogueBox_SetTextStr(game->dbGameOver, DB_GO_TEXT_MAX_CHAIN, buff);
+    sprintf(buff, "%d", totalCombos);
+    DialogueBox_SetTextStr(game->dbStats, 
+        DB_RES_TEXT_COMBOS, buff);
 
-  sprintf(buff, "%d", game->chain.maxCombo);
-  DialogueBox_SetTextStr(game->dbGameOver, DB_GO_TEXT_MAX_COMBO, buff);
+    sprintf(buff, "%d", maxChainBonus);
+    DialogueBox_SetTextStr(game->dbStats, 
+        DB_RES_TEXT_MAX_CHAIN, buff);
+
+    sprintf(buff, "%d", maxCombo);
+    DialogueBox_SetTextStr(game->dbStats, 
+        DB_RES_TEXT_MAX_COMBO, buff);
 
   game->time = ((float)clock()) / CLOCKS_PER_SEC - game->time;
   sprintf(buff, "%d:%02d", (game->time / 60) & 0x7F, game->time % 60);
@@ -355,22 +425,39 @@ void Game_Update(Game *game, int *inMenu, int mouseClicked) {
   if (_Game_HandleMenu(game, inMenu))
     return;
 
-  BallChain_Update(&game->chain, game->lvl->spiral, game->lvl->spiralLen,
-                   &game->score, &game->msgs);
+  BallChain_Update(&game->chain[0], game->lvl->spiral, game->lvl->spiralLen, &game->score, &game->msgs);
+    if(game->lvl->spiral2!=NULL)
+		BallChain_Update(&game->chain[1], game->lvl->spiral2, game->lvl->spiral2Len, &game->score, &game->msgs);
 
-  if (game->chain.len > 0) {
-    BulletsArr_UpdateOnScreenStatus(&game->bullets, &game->chain.chainBonus);
-    BulletsArr_Update(&game->bullets);
-  }
+    if (game->chain[0].len > 0) {
+        BulletsArr_UpdateOnScreenStatus(&game->bullets, &game->chain[0].chainBonus);
+        BulletsArr_Update(&game->bullets);
+    }
+    if (game->lvl->spiral2 != NULL){
+	    if (game->chain[1].len > 0) {
+	        BulletsArr_UpdateOnScreenStatus(&game->bullets, &game->chain[1].chainBonus);
+	        BulletsArr_Update(&game->bullets);
+	    }
+	}
 
-  if (game->chain.isGenerating && game->score > game->settings->gaugeScore) {
-    game->chain.isGenerating = 0;
-    game->chain.isGlowing = 1;
-    game->chain.glowTime = clock();
-    Engine_PlaySound(SND_CHANT4);
-  }
+    if (game->chain[0].isGenerating && game->score > game->settings->gaugeScore) {
+        game->chain[0].isGenerating = 0;
+        game->chain[0].isGlowing = 1;
+        game->chain[0].glowTime = clock();
+        Engine_PlaySound(SND_CHANT4);
+    }
+    if (game->lvl->spiral2 != NULL){
+		if (game->chain[1].isGenerating && game->score > game->settings->gaugeScore) {
+	        game->chain[1].isGenerating = 0;
+	        game->chain[1].isGlowing = 1;
+	        game->chain[1].glowTime = clock();
+	        //Engine_PlaySound(SND_CHANT4);
+		}
+	}
 
-  _Game_GenerateChain(game);
+    _Game_GenerateChain(game,0);
+    if(game->lvl->spiral2!=NULL)
+        _Game_GenerateChain(game,1);
   _Game_HandleGameWon(game);
   if (_Game_IsGameLose(game))
     return;
@@ -381,6 +468,14 @@ void Game_Update(Game *game, int *inMenu, int mouseClicked) {
     game->dbMenu = DialogueBox_CreateMenu();
   }
 
+  //get all available colors from both chains
+	bool colorInChain[6];
+	memcpy(colorInChain, game->chain[0].colorInChain, 6 * sizeof(bool) );
+	if(game->lvl->spiral2 != NULL){
+			for(int i=0;i<6;i++)
+				colorInChain[i] = colorInChain[i] || game->chain[1].colorInChain[i];
+	}
+
   if (isShooted && !(int)game->frog.shift &&
       game->btnMenu.state != BTN_CLICKED) {
     BulletsArr_AddBullet(&game->bullets, &game->frog);
@@ -388,33 +483,50 @@ void Game_Update(Game *game, int *inMenu, int mouseClicked) {
 
     game->frog.isShooted = 1;
     game->frog.color = game->frog.nextColor;
-    game->frog.nextColor = randInt(0, game->chain.ballColors - 1);
-    while (!game->chain.colorInChain[game->frog.nextColor])
-      game->frog.nextColor = randInt(0, game->chain.ballColors - 1);
+    game->frog.nextColor = randInt(0, game->chain[0].ballColors-1);
+    while(!colorInChain[game->frog.nextColor]) 
+      game->frog.nextColor = randInt(0, game->chain[0].ballColors-1);
   }
 
   // Changing frog color if color not in chain
-  if (!(game->isLosed || game->isWon || game->chain.isEndReached) &&
-      (!game->chain.colorInChain[game->frog.nextColor] ||
-       !game->chain.colorInChain[game->frog.color])) {
-    while (!game->chain.colorInChain[game->frog.nextColor])
-      game->frog.nextColor = randInt(0, game->chain.ballColors - 1);
+  if (!game->chain[0].isGenerating){ // I dont think i need to check both chains. This is needed so we dont get stuck in loop when there are no balls on screen
+	    if (!(game->isLosed || game->isWon || game->chain[0].isEndReached) 
+	        && (!colorInChain[game->frog.nextColor] || !colorInChain[game->frog.color])) {
+	        while(!colorInChain[game->frog.nextColor])
+	            game->frog.nextColor = randInt(0, game->chain[0].ballColors-1);
+	
+	        while(!colorInChain[game->frog.color])
+	            game->frog.color = randInt(0, game->chain[0].ballColors-1);
+	    }
+	}
 
-    while (!game->chain.colorInChain[game->frog.color])
-      game->frog.color = randInt(0, game->chain.ballColors - 1);
-  }
 
-  if (game->chain.balls[BallChain_GetLastMovingBall(&game->chain)].pos >
-      game->lvl->spiralLen * SLOWFACTOR_POS) {
-    if (game->chain.isEndReached)
-      game->chain.speed = ROLLING_TO_PIT_SPEED;
+    //slowdown when near end
+    if (game->chain[0].balls[BallChain_GetLastMovingBall(&game->chain[0])].pos > game->lvl->spiralLen * SLOWFACTOR_POS) { 
+        if (game->chain[0].isEndReached)
+            game->chain[0].speed = ROLLING_TO_PIT_SPEED;
+        else
+            game->chain[0].speed = game->settings->ballSpd / game->settings->slowFactor;
+    }
     else
-      game->chain.speed = game->settings->ballSpd / game->settings->slowFactor;
-  } else
-    game->chain.speed = game->settings->ballSpd;
+        game->chain[0].speed = game->settings->ballSpd;
 
-  BulletsArr_CollideWithChainUpdate(&game->bullets, &game->chain,
-                                    game->lvl->spiral);
+    //chain2 slowdown
+    if(game->lvl->spiral2 != NULL)
+    {
+      if (game->chain[1].balls[BallChain_GetLastMovingBall(&game->chain[1])].pos > game->lvl->spiral2Len * SLOWFACTOR_POS) { 
+            if (game->chain[1].isEndReached)
+                game->chain[1].speed = ROLLING_TO_PIT_SPEED;
+            else
+                game->chain[1].speed = game->settings->ballSpd / game->settings->slowFactor;
+        }
+        else
+            game->chain[1].speed = game->settings->ballSpd;
+	  }
+
+    BulletsArr_CollideWithChainUpdate(&game->bullets, &game->chain[0], game->lvl->spiral);
+    if(game->lvl->spiral2 != NULL)
+		BulletsArr_CollideWithChainUpdate(&game->bullets, &game->chain[1], game->lvl->spiral2);
   Messages_Update(&game->msgs);
   Game_UpdateTreasure(game);
 }
@@ -441,9 +553,14 @@ void Game_Draw(Game *game) {
     return;
   }
 
-  BallChain_Draw(&game->chain, false);
-  Level_DrawTopLayer(game->lvl);
-  BallChain_Draw(&game->chain, true);
+  BallChain_Draw(&game->chain[0], false);
+	if(game->lvl->spiral2)
+		BallChain_Draw(&game->chain[1], false);
+
+    Level_DrawTopLayer(game->lvl);
+    BallChain_Draw(&game->chain[0], true);
+	if(game->lvl->spiral2)
+		BallChain_Draw(&game->chain[1], true);
 
   BulletsArr_Draw(&game->bullets);
   Messages_Draw(&game->msgs);
@@ -467,7 +584,7 @@ void Game_Draw(Game *game) {
   if (game->DEBUG) {
     char buff[48];
 
-    sprintf(buff, "isGlowing: %d", game->chain.isGlowing);
+    sprintf(buff, "isGlowing: %d", game->chain[0].isGlowing);
     Engine_DrawText(buff, FONT_ARIAL_12, 600, 16);
 
     int w, h;
@@ -477,7 +594,7 @@ void Game_Draw(Game *game) {
 
     sprintf(buff, "Mouse_POS: (%d, %d)", game->mx, game->my);
     Engine_DrawText(buff, FONT_ARIAL_12, 16, 32);
-    sprintf(buff, "MAX_COMBO: %d", game->chain.maxCombo);
+    sprintf(buff, "MAX_COMBO: %d", game->chain[0].maxCombo);
     Engine_DrawText(buff, FONT_ARIAL_12, 16, 128);
 
     sprintf(buff, "BULLETS: ");
@@ -541,7 +658,8 @@ void Game_UpdateTreasure(Game *game) {
               (game->bullets.bullets[i].y - coinY);
 
       if (dist < TREASURE_COLLIDE_DIST) {
-        game->chain.chainBonus = 0;
+        game->chain[0].chainBonus = 0;
+        game->chain[1].chainBonus = 0;   
         game->treasure.isActive = false;
         game->treasure.isBlinking = false;
         game->treasure.isFading = true;
@@ -589,13 +707,28 @@ void Game_DrawFinish(Game *game) {
   Animation_Set(&anim, 0, 1, 0);
   Animation_Draw(&anim, game->finishPos.x, game->finishPos.y);
 
-  float dist_to_finish = game->lvl->spiralLen - game->chain.balls[0].pos;
+  float dist_to_finish = game->lvl->spiralLen - game->chain[0].balls[0].pos;
   int frame = 12 * ((game->lvl->spiralLen * PIT_OPEN_POS - dist_to_finish) /
                     (game->lvl->spiralLen * PIT_OPEN_POS));
   if (dist_to_finish < game->lvl->spiralLen * PIT_OPEN_POS)
     Animation_SetFrame(&game->finishAnim, frame);
 
   Animation_Draw(&game->finishAnim, game->finishPos.x, game->finishPos.y);
+  //finish2
+    if(game->lvl->spiral2 ==NULL)
+		return;
+    
+    Animation anim2;
+    Animation_Init(&anim2, TEX_GAME_OBJECTS, animFinishRect);
+    Animation_Set(&anim2, 0, 1, 0);
+    Animation_Draw(&anim2, game->finish2Pos.x, game->finish2Pos.y);
+    
+    dist_to_finish = game->lvl->spiral2Len - game->chain[1].balls[0].pos;
+    frame = 12 * ((game->lvl->spiral2Len * PIT_OPEN_POS - dist_to_finish) / (game->lvl->spiral2Len * PIT_OPEN_POS));
+    if (dist_to_finish < game->lvl->spiral2Len * PIT_OPEN_POS)
+        Animation_SetFrame(&game->finish2Anim, frame);
+
+    Animation_Draw(&game->finish2Anim, game->finish2Pos.x, game->finish2Pos.y);
 }
 
 void Game_DrawHUD(Game *game) {
@@ -654,10 +787,10 @@ void Game_UpdateOutro(Game *game) {
     game->particles.anim.color.b = 255;
     game->particles.anim.scale = 1.5;
 
-    game->particles.x = game->chain.balls[0].x;
-    game->particles.y = game->chain.balls[0].y;
-    game->particles.pos = game->chain.balls[0].pos;
-    game->particles.prevPos = game->chain.balls[0].pos;
+    game->particles.x = game->chain[0].balls[0].x;
+    game->particles.y = game->chain[0].balls[0].y;
+    game->particles.pos = game->chain[0].balls[0].pos;
+    game->particles.prevPos = game->chain[0].balls[0].pos;
 
     game->score += 100;
     Engine_PlaySound(SND_ENDOFLEVELPOP1);

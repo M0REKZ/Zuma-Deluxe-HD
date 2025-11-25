@@ -78,7 +78,7 @@ int BallChain_GetLastMovingBall(BallChain *ballChain) {
   return ballChain->len - 1;
 }
 
-void BallChain_Init(BallChain *ballChain, Level *lvl, LevelSettings *settings) {
+void BallChain_Init(BallChain *ballChain, SDL_FPoint spiralstart, LevelSettings *settings) {
   ballChain->speed = settings->ballSpd;
   ballChain->maxCombo = 0;
   ballChain->isGenerating = 1;
@@ -89,8 +89,8 @@ void BallChain_Init(BallChain *ballChain, Level *lvl, LevelSettings *settings) {
   ballChain->maxChainBonus = 0;
   ballChain->totalCombos = 0;
 
-  ballChain->startX = lvl->spiralStart.x;
-  ballChain->startY = lvl->spiralStart.y;
+  ballChain->startX = spiralstart.x;
+  ballChain->startY = spiralstart.y;
 
   ballChain->ballColors = settings->ballColors;
 
@@ -131,10 +131,12 @@ char BallChain_CollidesFront(BallChain *ballChain, int idx, int collideDist) {
           collideDist);
 }
 
-void BallChain_Append(BallChain *ballChain, Level *lvl,
+void BallChain_Append(BallChain *ballChain, SDL_FPoint spiralstart,
                       LevelSettings *settings) {
   char color = '\0';
-  if (ballChain->balls[ballChain->len - 1].isSingle) {
+  if(ballChain->len == 0)
+		color = randInt(0, ballChain->ballColors - 1);
+	else if (ballChain->balls[ballChain->len-1].isSingle) {
     color = ballChain->balls[ballChain->len - 1].color;
     while (color == ballChain->balls[ballChain->len - 1].color)
       color = randInt(0, ballChain->ballColors - 1);
@@ -161,8 +163,8 @@ void BallChain_Append(BallChain *ballChain, Level *lvl,
     color = randInt(0, ballChain->ballColors - 1);
   }
 
-  Ball_Init(&ballChain->balls[ballChain->len], 0, lvl->spiralStart.x,
-            lvl->spiralStart.y, 0, color, 0);
+  Ball_Init(&ballChain->balls[ballChain->len], 0, spiralstart.x,
+            spiralstart.y, 0, color, 0);
   ballChain->len++;
 }
 

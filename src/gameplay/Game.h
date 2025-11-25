@@ -42,7 +42,7 @@ typedef struct _Game {
   bool isFirstTime, isLosed, isWon, isIntroEnded, isOutroEnded;
   float headerFontScale, subHeaderFontScale;
 
-  BallChain chain;
+  BallChain chain[2];
   BulletsArr bullets;
   Messages msgs;
   Particles particles;
@@ -60,7 +60,9 @@ typedef struct _Game {
   Treasure treasure;
 
   SDL_FPoint finishPos;
+  SDL_FPoint finish2Pos;
   Animation finishAnim;
+  Animation finish2Anim;
 
   SDL_Rect scoreRect;
 

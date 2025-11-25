@@ -206,8 +206,8 @@ int LevelMgr_LoadLevels(const char *fileName) {
   levelMgr.survivalLevels = NULL;
   levelMgr.survivalLevelsLen = 0;
 
-  for (int i = 0; i < 11; i++) {
-    for (int j = 0; j < 11; j++) {
+  for (int i = 0; i < LEVELS_COUNT; i++) {
+    for (int j = 0; j < 4; j++) {
       levelMgr.bestScore[i][j] = 0;
       levelMgr.bestTime[i][j] = 0;
     }
@@ -381,8 +381,6 @@ int Level_Load(Level *level) {
     level->textureTopLayer = Engine_TextureLoad(path);
   }
 
-  level->spiral2 = NULL;
-
   sprintf(path, "%s/%s/%s.dat", PATH_LEVEL,
           levelMgr.graphics[level->graphicsID].id,
           levelMgr.graphics[level->graphicsID].spiralFile);
@@ -420,6 +418,58 @@ int Level_Load(Level *level) {
     level->spiral[i].dx = (float)x / 100.0;
     level->spiral[i].dy = (float)y / 100.0;
   }
+
+  fclose(file);
+	//spiral2
+	printf("\n%s",PATH_LEVEL);
+    sprintf(
+        path, 
+        "./%s/%s/%s.dat", 
+        PATH_LEVEL,
+        levelMgr.graphics[level->graphicsID].id,
+        levelMgr.graphics[level->graphicsID].spiral2File
+    );
+    file = fopen(path, "rb");
+
+    if (!file){
+		level->spiral2 = NULL;
+        return 0;
+	}
+
+    fseek(file, 0x10, SEEK_SET);
+    count = 0;
+    fread(&count, sizeof(int32_t), 1, file);
+    fseek(file, 0x14 + count * 10, SEEK_SET);
+
+    c = 0;
+    cx = 0;
+	cy = 0;
+
+    fread(&c, sizeof(int32_t), 1, file);
+    fread(&cx, sizeof(float), 1, file);
+    fread(&cy, sizeof(float), 1, file);
+
+
+    level->spiral2Start.x = cx;
+    level->spiral2Start.y = cy;
+    printf("\nspiral2start %lf , %s",cx,__func__);fflush(stdout);
+
+    level->spiral2Len = c-1;
+    level->spiral2 = malloc(sizeof(SpiralDot) * level->spiral2Len);
+
+    // i;
+    for (int i = 0; i < level->spiral2Len; i++) {
+        char t1, t2, x, y;
+        fread(&t1, 1, 1, file);
+        fread(&t2, 1, 1, file);
+        fread(&x, 1, 1, file);
+        fread(&y, 1, 1, file);
+
+        level->spiral2[i].t1 = t1;
+        level->spiral2[i].t2 = t2;
+        level->spiral2[i].dx = (float)x / 100.0;
+        level->spiral2[i].dy = (float)y / 100.0;
+    }
 
   fclose(file);
   return 1;
