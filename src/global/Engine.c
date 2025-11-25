@@ -1,5 +1,5 @@
 #include "Engine.h"
-#include <SDL2/SDL_mixer.h>
+#include <SDL_mixer.h>
 
 #define SOUNDS_CHANNEL 2
 #define SFX_CHANNEL 4
@@ -202,6 +202,7 @@ Font *Engine_FontLoad(const char *fileName) {
   font->rectList = NULL;
   font->offsetList = NULL;
   font->kerningPairsLen = 0;
+  font->kerningValuesLen = 0;
   font->kerningPairs = NULL;
   font->kerningValues = NULL;
 
@@ -294,7 +295,7 @@ Font *Engine_FontLoad(const char *fileName) {
         font->offsetList[i] = temp;
       }
     } else if (strcmp(str, "KerningPairs") == 0) {
-      font->kerningPairs = malloc(sizeof(font->kerningPairs) * n);
+      font->kerningPairs = malloc(sizeof(struct KerningPairsStruct) * n);
       if (!font->kerningPairs) {
         errFlag = 1;
         break;
@@ -303,13 +304,15 @@ Font *Engine_FontLoad(const char *fileName) {
       font->kerningPairsLen = n;
 
       for (int i = 0; i < n; i++) {
-        char temp[2];
-        if (!fscanf(file, "%s", temp)) {
+        char temp[3];
+        if (!fscanf(file, " %2s\n", temp)) {
           errFlag = 1;
           break;
         }
         font->kerningPairs[i].ch[0] = temp[0];
         font->kerningPairs[i].ch[1] = temp[1];
+
+        while(getc(file) != '\n'); //skip useless characters until new line
       }
     } else if (strcmp(str, "KerningValues") == 0) {
       font->kerningValues = malloc(sizeof(int) * n);
@@ -317,6 +320,8 @@ Font *Engine_FontLoad(const char *fileName) {
         errFlag = 1;
         break;
       }
+
+      font->kerningValuesLen = n;
 
       for (int i = 0; i < n; i++) {
         int temp;
@@ -424,7 +429,12 @@ void Engine_DrawTextScale(const char *str, unsigned int fontID, float scale,
         for (int k = 0; k < font->kerningPairsLen; k++) {
           if (str[i] == font->kerningPairs[k].ch[0] &&
               str[i + 1] == font->kerningPairs[k].ch[1])
-            width += font->kerningValues[k];
+              {
+                if(k < font->kerningValuesLen)
+                  width += font->kerningValues[k];
+                else
+                  width++;
+              }
         }
 
         SDL_FRect rect = {
@@ -475,7 +485,12 @@ int Engine_GetTextWidth(const char *str, unsigned int fontID) {
         for (int k = 0; k < font->kerningPairsLen; k++) {
           if (str[i] == font->kerningPairs[k].ch[0] &&
               str[i + 1] == font->kerningPairs[k].ch[1])
-            width += font->kerningValues[k];
+            {
+                if(k < font->kerningValuesLen)
+                  width += font->kerningValues[k];
+                else
+                  width++;
+              }
         }
 
         width += font->widthList[j];

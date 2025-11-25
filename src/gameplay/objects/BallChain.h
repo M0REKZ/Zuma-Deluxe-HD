@@ -1,7 +1,7 @@
 #ifndef BALL_H
 #define BALL_H
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include "../../global/Animation.h"

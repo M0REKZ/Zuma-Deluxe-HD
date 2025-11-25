@@ -3,9 +3,9 @@
 
 #define SDL_MAIN_HANDLED
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_mixer.h>
 #include <stdbool.h>
 
 #define STR_ERR_BUFFER_SIZE 128
@@ -30,7 +30,8 @@ typedef struct _Font {
   SDL_Point *offsetList;
 
   int kerningPairsLen;
-  struct {
+  int kerningValuesLen;
+  struct KerningPairsStruct {
     char ch[2];
   } *kerningPairs;
   int *kerningValues;

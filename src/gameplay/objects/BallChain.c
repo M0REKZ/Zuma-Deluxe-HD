@@ -133,7 +133,7 @@ char BallChain_CollidesFront(BallChain *ballChain, int idx, int collideDist) {
 
 void BallChain_Append(BallChain *ballChain, Level *lvl,
                       LevelSettings *settings) {
-  char color;
+  char color = '\0';
   if (ballChain->balls[ballChain->len - 1].isSingle) {
     color = ballChain->balls[ballChain->len - 1].color;
     while (color == ballChain->balls[ballChain->len - 1].color)
