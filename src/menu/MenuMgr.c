@@ -1059,8 +1059,8 @@ void MenuMgr_Draw(MenuMgr *m) {
 
     Engine_DrawText("WELCOME TO ZUMA HD!", FONT_NATIVE_ALIEN_EXT_16, 426, 0);
 
-    Engine_DrawText("REMASTER BY\nGALAXYSHAD AND S4LAT. 2021", FONT_CANCUN_10,
-                    16, 660);
+    Engine_DrawText("REMASTER BY\nGALAXYSHAD, HCSUBSER,\n180WATT AND S4LAT. 2021-2025", FONT_CANCUN_10,
+                    16, 644);
     Engine_DrawText("ORIGINAL GAME BY POPCAP. 2003", FONT_CANCUN_10, 16, 694);
 
   } else if (m->roomID == MR_GAUNTLET) {
