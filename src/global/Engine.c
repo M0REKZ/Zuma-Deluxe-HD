@@ -756,7 +756,7 @@ void Engine_PlaySound(uint32_t soundID)
     return;
 
   Mix_VolumeChunk(engine.sounds[soundID], MIX_MAX_VOLUME * engine.volSnd);
-  Mix_PlayChannel(SOUNDS_CHANNEL, engine.sounds[soundID], 1);
+  Mix_PlayChannel(SOUNDS_CHANNEL, engine.sounds[soundID], 0);
 }
 
 void Engine_StopSound(uint32_t soundID)
@@ -772,7 +772,7 @@ void Engine_PlaySoundSfxPitch(int soundID, float pitch)
   (void)pitch;
   // TODO: pitch
   Mix_VolumeChunk(engine.soundsSfx[soundID], MIX_MAX_VOLUME * engine.volSnd);
-  Mix_PlayChannel(SFX_CHANNEL, engine.soundsSfx[soundID], 1);
+  Mix_PlayChannel(SFX_CHANNEL, engine.soundsSfx[soundID], 0);
 }
 
 void Engine_StopSoundSfx(int soundID)

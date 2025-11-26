@@ -203,12 +203,14 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
   }
 
   //special ball code:
-	if(randInt(0,100)==0){//not good rand code fixme
-		if(ballChain->specialBalls<2){
-			ballChain->balls[randInt(0,ballChain->len-1)].type = BALL_TYPE_PAUSE; 
-			ballChain->specialBalls++;
-		}
-	}
+  if(ballChain->len > 0 && ballChain->specialBalls<2)
+  {
+    if(randInt(0,100)==0)
+    {  
+      ballChain->balls[randInt(0,ballChain->len-1)].type = randInt(1,NUM_BALL_TYPES-1); 
+      ballChain->specialBalls++;  
+    }
+  }
 
   // movement code I suppose (applies per ball duuh)
   for (int i = ballChain->len - 1; i >= 0; i--)
@@ -537,7 +539,7 @@ void BallChain_ExplodeBalls(BallChain *ballChain, int start, int end)
     Animation_Set(ballAnim, 0, 16, BALL_EXPLODE_SPEED);
 
     ballChain->balls[i].isExploding = 1;
-    
+
     if(ballChain->balls[i].type != BALL_TYPE_NORMAL)
 			ballChain->specialBalls--;
   }
