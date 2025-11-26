@@ -618,12 +618,14 @@ void BallChain_Destroy(BallChain *ballChain, int start, int end)
 }
 
 void BallChain_Insert(BallChain *ballChain, int idx, char color,
-                      bool isInsertBack)
+                      bool isInsertBack, bool copyType)
 {
   Ball curr;
   Ball prev;
 
   Ball_Copy(&ballChain->balls[idx], &prev);
+  if(!copyType)
+    ballChain->balls[idx].type = BALL_TYPE_NORMAL; //dont copy special balls
   for (int i = idx + 1; i < ballChain->len + 1; i++)
   {
     Ball_Copy(&ballChain->balls[i], &curr);

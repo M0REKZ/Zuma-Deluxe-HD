@@ -79,7 +79,7 @@ void BallChain_Init(BallChain *, SDL_FPoint spiralstart, LevelSettings *);
 void BallChain_Append(BallChain *, SDL_FPoint spiralstart, LevelSettings *);
 void BallChain_FindSubChain(BallChain *, int, int *, int *);
 void BallChain_Destroy(BallChain *, int, int);
-void BallChain_Insert(BallChain *, int, char, bool);
+void BallChain_Insert(BallChain *, int, char, bool, bool);
 int BallChain_GetLastMovingBall(BallChain *);
 
 char BallChain_CollidesFront(BallChain *, int, int);

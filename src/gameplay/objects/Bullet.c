@@ -154,7 +154,7 @@ void BulletsArr_CollideWithChainUpdate(BulletsArr *bulletsArr, BallChain *ballCh
 			collBall = collBall + isInsertBack;
 
 			BallChain_Insert(ballChain, collBall,
-							 bulletsArr->bullets[i].color, isInsertBack);
+							 bulletsArr->bullets[i].color, isInsertBack, false);
 		}
 	}
 }
