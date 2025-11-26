@@ -767,8 +767,11 @@ void Engine_StopSound(uint32_t soundID)
   Mix_HaltChannel(SOUNDS_CHANNEL);
 }
 
-void Engine_PlaySoundSfxPitch(int soundID, float pitch)
+void Engine_PlaySoundSfxPitch(uint32_t soundID, float pitch)
 {
+  if(soundID >= engine.soundsSfxLen)
+    return;
+  
   (void)pitch;
   // TODO: pitch
   Mix_VolumeChunk(engine.soundsSfx[soundID], MIX_MAX_VOLUME * engine.volSnd);

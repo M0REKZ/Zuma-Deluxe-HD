@@ -115,7 +115,7 @@ void Engine_PlayMusic(uint32_t);
 void Engine_StopMusic();
 void Engine_PlaySound(uint32_t);
 void Engine_StopSound(uint32_t);
-void Engine_PlaySoundSfxPitch(int, float);
+void Engine_PlaySoundSfxPitch(uint32_t, float);
 void Engine_StopSoundSfx(int);
 
 void Engine_GetMousePos(int *mx, int *my);
