@@ -514,7 +514,8 @@ void Game_Update(Game *game, int *inMenu, int mouseClicked)
       colorInChain[i] = colorInChain[i] || game->chain[1].colorInChain[i];
   }
 
-  if (isShooted && !(int)game->frog.shift &&
+  if ((game->chain[0].len || game->chain[1].len) &&
+      isShooted && !(int)game->frog.shift &&
       game->btnMenu.state != BTN_CLICKED)
   {
     BulletsArr_AddBullet(&game->bullets, &game->frog);
