@@ -493,34 +493,34 @@ void BallChain_ExplodeBalls(BallChain *ballChain, int start, int end)
     switch (ballChain->balls[i].color)
     {
     case 0:
-      ballAnim->color.r = 0x00;
-      ballAnim->color.g = 0xFE;
-      ballAnim->color.b = 0xFD;
+      ballAnim->color.r = 0;
+      ballAnim->color.g = 254;
+      ballAnim->color.b = 253;
       break;
     case 1:
-      ballAnim->color.r = 0x00;
-      ballAnim->color.g = 0xFA;
-      ballAnim->color.b = 0x44;
+      ballAnim->color.r = 0;
+      ballAnim->color.g = 250;
+      ballAnim->color.b = 68;
       break;
     case 2:
-      ballAnim->color.r = 0xFD;
-      ballAnim->color.g = 0xFD;
-      ballAnim->color.b = 0x06;
+      ballAnim->color.r = 253;
+      ballAnim->color.g = 253;
+      ballAnim->color.b = 6;
       break;
     case 3:
-      ballAnim->color.r = 0xF9;
-      ballAnim->color.g = 0x6F;
-      ballAnim->color.b = 0x4C;
+      ballAnim->color.r = 249;
+      ballAnim->color.g = 111;
+      ballAnim->color.b = 76;
       break;
     case 4:
-      ballAnim->color.r = 0xFD;
-      ballAnim->color.g = 0x88;
-      ballAnim->color.b = 0xF8;
+      ballAnim->color.r = 253;
+      ballAnim->color.g = 136;
+      ballAnim->color.b = 248;
       break;
     case 5:
-      ballAnim->color.r = 0xFD;
-      ballAnim->color.g = 0xEA;
-      ballAnim->color.b = 0xBB;
+      ballAnim->color.r = 253;
+      ballAnim->color.g = 234;
+      ballAnim->color.b = 187;
       break;
     }
 
