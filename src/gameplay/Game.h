@@ -74,6 +74,10 @@ typedef struct _Game
   DialogueBox *dbStats;
   DialogueBox *dbGameOver;
 
+  //Special ball effects:
+
+  int ballEffectPauseTime;
+
 } Game;
 
 void Game_Init(Game *, int, int);

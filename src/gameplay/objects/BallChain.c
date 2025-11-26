@@ -1,3 +1,4 @@
+#include "../../Application.h"
 #include "BallChain.h"
 
 void Ball_Init(Ball *ball, float pos, float x, float y, char isPusher,
@@ -217,7 +218,11 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
   {
     Ball *ball = &ballChain->balls[i];
 
-    if (i == ballChain->len - 1)
+    if (app.game.ballEffectPauseTime > 0)
+    {
+      ball->spd = 0;
+    }
+    else if (i == ballChain->len - 1)
     {
       if (ballChain->speed == ROLLING_TO_PIT_SPEED)
         ball->spd = ROLLING_TO_PIT_SPEED;
@@ -541,7 +546,19 @@ void BallChain_ExplodeBalls(BallChain *ballChain, int start, int end)
     ballChain->balls[i].isExploding = 1;
 
     if(ballChain->balls[i].type != BALL_TYPE_NORMAL)
+    {
 			ballChain->specialBalls--;
+
+      switch (ballChain->balls[i].type)
+      {
+      case BALL_TYPE_PAUSE:
+        app.game.ballEffectPauseTime = MAX_FPS;
+        break;
+        
+      default:
+        break;
+      }
+    }
   }
 
   float comboPitch = 0;

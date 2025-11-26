@@ -22,6 +22,9 @@ void Game_Init(Game *game, int lvlID, int difficulty)
   game->subHeaderFontScale = 0;
   game->difficulty = difficulty;
 
+  //Special balls
+  game->ballEffectPauseTime = 0;
+
   Stage *stg = LevelMgr_GetStage(game->stageID);
 
   game->lvlID = lvlID;
@@ -571,6 +574,11 @@ void Game_Update(Game *game, int *inMenu, int mouseClicked)
     BulletsArr_CollideWithChainUpdate(&game->bullets, &game->chain[1], game->lvl->spiral2);
   Messages_Update(&game->msgs);
   Game_UpdateTreasure(game);
+
+  if (game->ballEffectPauseTime > 0)
+  {
+    game->ballEffectPauseTime--;
+  }
 }
 
 void Game_Draw(Game *game)
