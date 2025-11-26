@@ -202,10 +202,7 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
   {
     Ball *ball = &ballChain->balls[i];
 
-    if (ballChain->isGlowing)
-      ball->spd = -ballChain->speed * 2;
-
-    if (i == ballChain->len - 1 && !ballChain->isGlowing)
+    if (i == ballChain->len - 1)
     {
       if (ballChain->speed == ROLLING_TO_PIT_SPEED)
         ball->spd = ROLLING_TO_PIT_SPEED;
