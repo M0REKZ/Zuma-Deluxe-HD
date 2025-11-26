@@ -327,10 +327,10 @@ static void _Game_HandleGameWon(Game *game)
   game->dbStats = DialogueBox_CreateResults();
 
   char buff[8];
-  sprintf(buff, "%d", game->score);
+  snprintf(buff, sizeof(buff), "%d", game->score);
   DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_POINTS, buff);
 
-  sprintf(buff, "%d", game->totalCoins);
+  snprintf(buff, sizeof(buff), "%d", game->totalCoins);
   DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_COINS, buff);
 
   int totalCombos = game->chain[0].totalCombos;
@@ -343,17 +343,17 @@ static void _Game_HandleGameWon(Game *game)
     maxCombo += game->chain[1].maxCombo;
   }
 
-  sprintf(buff, "%d", totalCombos);
+  snprintf(buff, sizeof(buff), "%d", totalCombos);
   DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_COMBOS, buff);
 
-  sprintf(buff, "%d", maxChainBonus);
+  snprintf(buff, sizeof(buff), "%d", maxChainBonus);
   DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_MAX_CHAIN, buff);
 
-  sprintf(buff, "%d", maxCombo);
+  snprintf(buff, sizeof(buff), "%d", maxCombo);
   DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_MAX_COMBO, buff);
 
   game->time = ((float)clock()) / CLOCKS_PER_SEC - game->time;
-  sprintf(buff, "%d:%02d", (game->time / 60) & 0x7F, game->time % 60);
+  snprintf(buff, sizeof(buff), "%d:%02d", (game->time / 60) & 0x7F, game->time % 60);
   DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_YOUR_TIME, buff);
 
   if (game->time <= game->settings->partTime)
@@ -363,7 +363,7 @@ static void _Game_HandleGameWon(Game *game)
     game->dbStats->texts[DB_RES_TEXT_YOUR_TIME].color.b = 0;
   }
 
-  sprintf(buff, "%d:%02d", (game->settings->partTime / 60) & 0x7F,
+  snprintf(buff, sizeof(buff), "%d:%02d", (game->settings->partTime / 60) & 0x7F,
           game->settings->partTime % 60);
   DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_ACE_TIME, buff);
 
@@ -402,7 +402,7 @@ static bool _Game_IsGameLose(Game *game)
 
   char buff[8];
 
-  sprintf(buff, "%d", game->totalCoins);
+  snprintf(buff, sizeof(buff), "%d", game->totalCoins);
   DialogueBox_SetTextStr(game->dbGameOver, DB_GO_TEXT_COINS, buff);
 
   int totalCombos = game->chain[0].totalCombos;
@@ -415,20 +415,20 @@ static bool _Game_IsGameLose(Game *game)
     maxCombo += game->chain[1].maxCombo;
   }
 
-  sprintf(buff, "%d", totalCombos);
+  snprintf(buff, sizeof(buff), "%d", totalCombos);
   DialogueBox_SetTextStr(game->dbStats,
                          DB_RES_TEXT_COMBOS, buff);
 
-  sprintf(buff, "%d", maxChainBonus);
+  snprintf(buff, sizeof(buff), "%d", maxChainBonus);
   DialogueBox_SetTextStr(game->dbStats,
                          DB_RES_TEXT_MAX_CHAIN, buff);
 
-  sprintf(buff, "%d", maxCombo);
+  snprintf(buff, sizeof(buff), "%d", maxCombo);
   DialogueBox_SetTextStr(game->dbStats,
                          DB_RES_TEXT_MAX_COMBO, buff);
 
   game->time = ((float)clock()) / CLOCKS_PER_SEC - game->time;
-  sprintf(buff, "%d:%02d", (game->time / 60) & 0x7F, game->time % 60);
+  snprintf(buff, sizeof(buff), "%d:%02d", (game->time / 60) & 0x7F, game->time % 60);
   DialogueBox_SetTextStr(game->dbGameOver, DB_GO_TEXT_TOTAL_TIME, buff);
 
   game->isLosed = true;
@@ -634,24 +634,24 @@ void Game_Draw(Game *game)
   {
     char buff[48];
 
-    sprintf(buff, "isGlowing: %d", game->chain[0].isGlowing);
+    snprintf(buff, sizeof(buff), "isGlowing: %d", game->chain[0].isGlowing);
     Engine_DrawText(buff, FONT_ARIAL_12, 600, 16);
 
     int w, h;
     SDL_GetWindowSize(engine.win, &w, &h);
-    sprintf(buff, "Window_Size: (%d, %d)", w, h);
+    snprintf(buff, sizeof(buff), "Window_Size: (%d, %d)", w, h);
     Engine_DrawText(buff, FONT_ARIAL_12, 16, 16);
 
-    sprintf(buff, "Mouse_POS: (%d, %d)", game->mx, game->my);
+    snprintf(buff, sizeof(buff), "Mouse_POS: (%d, %d)", game->mx, game->my);
     Engine_DrawText(buff, FONT_ARIAL_12, 16, 32);
-    sprintf(buff, "MAX_COMBO: %d", game->chain[0].maxCombo);
+    snprintf(buff, sizeof(buff), "MAX_COMBO: %d", game->chain[0].maxCombo);
     Engine_DrawText(buff, FONT_ARIAL_12, 16, 128);
 
-    sprintf(buff, "BULLETS: ");
+    snprintf(buff, sizeof(buff), "BULLETS: ");
     Engine_DrawText(buff, FONT_ARIAL_12, 240, 16);
     for (int i = 0; i < game->bullets.len; i++)
     {
-      sprintf(buff, "    %d. (%lf, %lf, %d)", i + 1, game->bullets.bullets[i].x,
+      snprintf(buff, sizeof(buff), "    %d. (%lf, %lf, %d)", i + 1, game->bullets.bullets[i].x,
               game->bullets.bullets[i].y, game->bullets.bullets[i].onScreen);
       Engine_DrawText(buff, FONT_ARIAL_12, 240, 16 * (i + 2));
     }
@@ -734,7 +734,7 @@ void Game_UpdateTreasure(Game *game)
         game->score += 500;
         game->totalCoins++;
         char txt[MAX_MSG_LEN];
-        sprintf(txt, "BONUS +500");
+        snprintf(txt, sizeof(txt), "BONUS +500");
         Messages_NewMsg(&game->msgs, txt, coinX, coinY, FONT_CANCUN_FLOAT_14,
                         2);
         Engine_PlaySound(SND_COINGRAB);
@@ -809,10 +809,10 @@ void Game_DrawHUD(Game *game)
   SDL_Color yellow = {255, 255, 0, 255};
 
   char buff[64];
-  sprintf(buff, "%9d", game->score);
+  snprintf(buff, sizeof(buff), "%9d", game->score);
   Engine_DrawTextExt(buff, FONT_CANCUN_12, yellow, 0, 0, 545, 6);
 
-  sprintf(buff, "lvl%d-%d", game->stageID + 1, game->lvlID + 1);
+  snprintf(buff, sizeof(buff), "lvl%d-%d", game->stageID + 1, game->lvlID + 1);
   Engine_DrawTextExt(buff, FONT_CANCUN_12, yellow, 0, 1, 460, 6);
 
   SDL_Rect animFrogRect = {40, 18, 40, 36};
@@ -828,7 +828,7 @@ void Game_DrawHUD(Game *game)
   else
   {
     Animation_Draw(&anim, 57, 22);
-    sprintf(buff, "x%d", game->lives);
+    snprintf(buff, sizeof(buff), "x%d", game->lives);
     Engine_DrawText(buff, FONT_CANCUN_FLOAT_14, 77, 12);
   }
 
@@ -897,7 +897,7 @@ void Game_UpdateOutro(Game *game)
     game->particles.len = 0;
 
     char buff[8];
-    sprintf(buff, "%d", game->score);
+    snprintf(buff, sizeof(buff), "%d", game->score);
     DialogueBox_SetTextStr(game->dbStats, DB_RES_TEXT_POINTS, buff);
     return;
   }
@@ -1010,12 +1010,12 @@ void Game_DrawIntro(Game *game)
   char buff[255];
   SDL_Color color = {255, 255, 255, 255};
 
-  sprintf(buff, "%s", game->graphics->dispName);
+  snprintf(buff, sizeof(buff), "%s", game->graphics->dispName);
   Engine_DrawTextExtScale(buff, FONT_NATIVE_ALIEN_EXT_16,
                           game->subHeaderFontScale, color, false, true,
                           WINDOW_WIDTH - 250, WINDOW_HEIGHT - 95);
 
-  sprintf(buff, "LEVEL %d-%d", game->lvlID + 1, game->difficulty + 1);
+  snprintf(buff, sizeof(buff), "LEVEL %d-%d", game->lvlID + 1, game->difficulty + 1);
   Engine_DrawTextExtScale(buff, FONT_NATIVE_ALIEN_48, game->headerFontScale,
                           color, false, true, WINDOW_WIDTH - 250,
                           WINDOW_HEIGHT - 200);

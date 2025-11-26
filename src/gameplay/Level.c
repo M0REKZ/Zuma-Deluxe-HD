@@ -253,7 +253,7 @@ int LevelMgr_LoadLevels(const char *fileName)
   int done;
 
   char path[STR_PATH_BUFFER_SIZE];
-  sprintf(path, "%s/%s", PATH_LEVEL, fileName);
+  snprintf(path, sizeof(path), "%s/%s", PATH_LEVEL, fileName);
 
   char *buff = malloc(XML_BUFF_SIZE);
   if (!buff)
@@ -424,7 +424,7 @@ int Level_Load(Level *level)
 {
   char path[STR_PATH_BUFFER_SIZE];
 
-  sprintf(path, "%s/%s/%s.jpg", PATH_LEVEL,
+  snprintf(path, sizeof(path), "%s/%s/%s.jpg", PATH_LEVEL,
           levelMgr.graphics[level->graphicsID].id,
           levelMgr.graphics[level->graphicsID].textureFile);
   level->texture = Engine_TextureLoad(path);
@@ -435,13 +435,13 @@ int Level_Load(Level *level)
   if (!(strcmp(levelMgr.graphics[level->graphicsID].textureTopLayerFile,
                "none") == 0))
   {
-    sprintf(path, "%s/%s/%s.png", PATH_LEVEL,
+    snprintf(path, sizeof(path), "%s/%s/%s.png", PATH_LEVEL,
             levelMgr.graphics[level->graphicsID].id,
             levelMgr.graphics[level->graphicsID].textureTopLayerFile);
     level->textureTopLayer = Engine_TextureLoad(path);
   }
 
-  sprintf(path, "%s/%s/%s.dat", PATH_LEVEL,
+  snprintf(path, sizeof(path), "%s/%s/%s.dat", PATH_LEVEL,
           levelMgr.graphics[level->graphicsID].id,
           levelMgr.graphics[level->graphicsID].spiralFile);
   FILE *file = fopen(path, "rb");
@@ -483,8 +483,8 @@ int Level_Load(Level *level)
   fclose(file);
   // spiral2
   printf("\n%s", PATH_LEVEL);
-  sprintf(
-      path,
+  snprintf(
+      path, sizeof(path),
       "./%s/%s/%s.dat",
       PATH_LEVEL,
       levelMgr.graphics[level->graphicsID].id,

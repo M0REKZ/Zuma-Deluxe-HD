@@ -263,12 +263,12 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
               char txt[MAX_MSG_LEN];
               if (combo)
               {
-                sprintf(txt, "+%d\nCOMBO x%d", score_delta, combo);
+                snprintf(txt, sizeof(txt), "+%d\nCOMBO x%d", score_delta, combo);
                 // NEW
                 ballChain->totalCombos++;
               }
               else
-                sprintf(txt, "+%d", score_delta);
+                snprintf(txt, sizeof(txt), "+%d", score_delta);
 
               if (combo > ballChain->maxCombo)
                 ballChain->maxCombo = combo;
@@ -372,10 +372,10 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
 
             char txt[MAX_MSG_LEN];
             if (ballChain->chainBonus >= 5)
-              sprintf(txt, "+%d\nCHAIN BONUS x%d", score_delta,
+              snprintf(txt, sizeof(txt), "+%d\nCHAIN BONUS x%d", score_delta,
                       ballChain->chainBonus);
             else
-              sprintf(txt, "+%d", score_delta);
+              snprintf(txt, sizeof(txt), "+%d", score_delta);
             float x = ballChain->balls[(int)(end - ((end - start + 1) / 2))].x;
             float y = ballChain->balls[(int)(end - ((end - start + 1) / 2))].y;
             Messages_NewMsg(msgs, txt, x, y, FONT_CANCUN_FLOAT_14,
@@ -413,10 +413,10 @@ void BallChain_Update(BallChain *ballChain, SpiralDot *spiral, int spiralLen,
 
         char txt[MAX_MSG_LEN];
         if (ballChain->chainBonus >= 5)
-          sprintf(txt, "+%d\nCHAIN BONUS x%d", score_delta,
+          snprintf(txt, sizeof(txt), "+%d\nCHAIN BONUS x%d", score_delta,
                   ballChain->chainBonus);
         else
-          sprintf(txt, "+%d", score_delta);
+          snprintf(txt, sizeof(txt), "+%d", score_delta);
         float x = ballChain->balls[(int)(end - ((end - start + 1) / 2))].x;
         float y = ballChain->balls[(int)(end - ((end - start + 1) / 2))].y;
         Messages_NewMsg(msgs, txt, x, y, FONT_CANCUN_FLOAT_14,

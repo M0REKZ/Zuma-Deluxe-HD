@@ -6,7 +6,7 @@ void Message_Init(Message *msg, char *text, float x, float y, char font, char co
 	msg->y = y;
 	msg->color = color;
 	msg->font = font;
-	sprintf(msg->text, "%s", text);
+	snprintf(msg->text, sizeof(msg->text), "%s", text);
 
 	msg->onScreen = true;
 	msg->spd = MSG_SPD;

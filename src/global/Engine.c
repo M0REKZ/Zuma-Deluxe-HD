@@ -10,28 +10,28 @@ Engine engine;
 void Engine_PushError(const char *header, const char *main)
 {
   char errMsg[STR_ERR_BUFFER_SIZE];
-  sprintf(errMsg, "%s\n%s", header, main);
+  snprintf(errMsg, sizeof(errMsg), "%s\n%s", header, main);
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errMsg, NULL);
 }
 
 void Engine_PushErrorCode(const char *header, int code)
 {
   char errMsg[STR_ERR_BUFFER_SIZE];
-  sprintf(errMsg, "%s\nError code: %d", header, code);
+  snprintf(errMsg, sizeof(errMsg), "%s\nError code: %d", header, code);
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errMsg, NULL);
 }
 
 void Engine_PushErrorFile(const char *file, const char *main)
 {
   char pathMsg[STR_ERR_BUFFER_SIZE];
-  sprintf(pathMsg, "Error loading file \"%s\".", file);
+  snprintf(pathMsg, sizeof(pathMsg), "Error loading file \"%s\".", file);
   Engine_PushError(pathMsg, main);
 }
 
 void Engine_PushErrorFileCode(const char *file, int code)
 {
   char pathMsg[STR_ERR_BUFFER_SIZE];
-  sprintf(pathMsg, "Error loading file \"%s\".", file);
+  snprintf(pathMsg, sizeof(pathMsg), "Error loading file \"%s\".", file);
   Engine_PushErrorCode(pathMsg, code);
 }
 
@@ -190,7 +190,7 @@ int Engine_TexturesLoad(const char **files, int n)
   char path[STR_PATH_BUFFER_SIZE];
   for (int i = 0; i < n; i++)
   {
-    sprintf(path, "%s/%s", TEXTURE_FOLDER, files[i]);
+    snprintf(path, sizeof(path), "%s/%s", TEXTURE_FOLDER, files[i]);
 
     engine.textures[i] = Engine_TextureLoad(path);
     if (!engine.textures[i])
@@ -232,7 +232,7 @@ Font *Engine_FontLoad(const char *fileName)
 
   char path[STR_PATH_BUFFER_SIZE];
 
-  sprintf(path, "%s/%s.png", FONT_FOLDER, fileName);
+  snprintf(path, sizeof(path), "%s/%s.png", FONT_FOLDER, fileName);
   font->texture = Engine_TextureLoad(path);
   if (!font->texture)
   {
@@ -240,7 +240,7 @@ Font *Engine_FontLoad(const char *fileName)
     return NULL;
   }
 
-  sprintf(path, "%s/%s.txt", FONT_FOLDER, fileName);
+  snprintf(path, sizeof(path), "%s/%s.txt", FONT_FOLDER, fileName);
   FILE *file = fopen(path, "r");
   if (!file)
   {
@@ -645,7 +645,7 @@ void Engine_DrawTextExtScale(const char *str, int fontID, float scale,
 int Engine_MusicLoad(const char *fileName)
 {
   char path[STR_PATH_BUFFER_SIZE];
-  sprintf(path, "%s/%s", MUSIC_FOLDER, fileName);
+  snprintf(path, sizeof(path), "%s/%s", MUSIC_FOLDER, fileName);
   engine.music = Mix_LoadMUS(path);
   if (!engine.music)
   {
@@ -683,7 +683,7 @@ int Engine_SoundsLoad(const char **files, uint32_t n)
   for (size_t i = 0; i < n; i++)
   {
     char path[STR_PATH_BUFFER_SIZE];
-    sprintf(path, "%s/%s", SOUND_FOLDER, files[i]);
+    snprintf(path, sizeof(path), "%s/%s", SOUND_FOLDER, files[i]);
 
     engine.sounds[i] = Engine_SoundLoad(path);
     if (!engine.sounds[i])
@@ -722,7 +722,7 @@ int Engine_SoundsSfxLoad(const char **files, uint32_t n)
   for (size_t i = 0; i < n; i++)
   {
     char path[STR_PATH_BUFFER_SIZE];
-    sprintf(path, "%s/%s", SOUND_FOLDER, files[i]);
+    snprintf(path, sizeof(path), "%s/%s", SOUND_FOLDER, files[i]);
 
     engine.soundsSfx[i] = Engine_SoundSfxLoad(path);
     if (!engine.soundsSfx[i])

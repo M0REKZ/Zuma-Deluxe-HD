@@ -1175,21 +1175,21 @@ void MenuMgr_Draw(MenuMgr *m)
     char buff[32];
     SDL_Color color = {255, 255, 255, 255};
 
-    sprintf(buff, "BEST SCORE:");
+    snprintf(buff, sizeof(buff), "BEST SCORE:");
     Engine_DrawTextExt(buff, FONT_CANCUN_10, color, true, false, 924, 632);
 
-    sprintf(buff, "%d", levelMgr.bestScore[*m->curLvl][*m->curDiff]);
+    snprintf(buff, sizeof(buff), "%d", levelMgr.bestScore[*m->curLvl][*m->curDiff]);
     color.b = 0;
     Engine_DrawTextExt(buff, FONT_CANCUN_10, color, true, false, 1140, 632);
 
-    sprintf(buff, "BEST TIME:");
+    snprintf(buff, sizeof(buff), "BEST TIME:");
     color.b = 255;
     Engine_DrawTextExt(buff, FONT_CANCUN_10, color, true, false, 924, 686);
 
     int min, sec;
     min = levelMgr.bestTime[*m->curLvl][*m->curDiff] / 60;
     sec = levelMgr.bestTime[*m->curLvl][*m->curDiff] % 60;
-    sprintf(buff, "%d:%02d", min, sec);
+    snprintf(buff, sizeof(buff), "%d:%02d", min, sec);
     color.b = 0;
     Engine_DrawTextExt(buff, FONT_CANCUN_10, color, true, false, 1140, 686);
   }
